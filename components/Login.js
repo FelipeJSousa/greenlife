@@ -3,7 +3,7 @@ import {useState} from 'react';
 
 
 
-const Login = () => {
+const Login = ({navigation}) => {
 
   let 
     [visivel, setVisivel] = useState(false),
@@ -23,8 +23,11 @@ const Login = () => {
   }
 
   const acessar = () => {
-
-    mostrarSnack()
+    if (email && senha){
+      navigation.navigate("MenuLateral");
+    }else{
+      mostrarSnack()
+    }
 
   }
   

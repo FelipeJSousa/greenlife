@@ -2,6 +2,7 @@ import React from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import Navigator from './Navigator'
 import ListItems from './ListItems'
+import Home from './Home'
 
 const Drawer = createDrawerNavigator();
 
@@ -19,6 +20,10 @@ const MenuLateral = () => {
         <Drawer.Screen 
             name="ListItems" 
             component={ListItems}
+        ></Drawer.Screen>
+        <Drawer.Screen 
+            name="Sair" 
+            component={Home}
         ></Drawer.Screen>
     </Drawer.Navigator>
   )

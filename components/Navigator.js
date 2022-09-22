@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { createStackNavigator } from "@react-navigation/stack"
 import ListItems from './ListItems'
 import Home from './Home'
-import {Ionicons} from 'react-native-vector-icons'
+import Login from './Login'
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -13,6 +13,7 @@ const StackNav = () => {
         <Stack.Navigator>
             <Stack.Screen name="Home" component={Home}></Stack.Screen>
             <Stack.Screen name="ListIems" component={ListItems}></Stack.Screen>
+            <Stack.Screen name="Sair" component={Login}></Stack.Screen>
         </Stack.Navigator>
     )
 }
