@@ -1,22 +1,40 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Card, Text } from 'react-native-paper';
-import { View, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
+import CardPost from './CardPost';
 
 const styles = StyleSheet.create({
-  view: { flex: 1, justifyContent: 'center', padding: 10 },
+  view: { flex: 1, padding: 10 },
 });
 
 function Home() {
+  const navigation = useNavigation();
+  const CardPressHandle = () => {
+    navigation?.navigate('Post');
+  };
   return (
-    <View style={styles.view}>
-      <Card>
-        <Card.Title title="Seja Bem-vindo!" subtitle="Primeiro Aplicativo." />
-        <Card.Content>
-          <Text>Esse aqui é o conteúdo do card!</Text>
-        </Card.Content>
-        <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
-      </Card>
-    </View>
+    <>
+      <Text
+        style={{
+          fontSize: 50,
+          lineHeight: 50,
+          textAlign: 'center',
+          padding: 25,
+        }}
+      >
+        Feed
+      </Text>
+      <ScrollView style={{ flex: 5, padding: 10 }}>
+        <CardPost onPress={CardPressHandle} />
+        <CardPost onPress={CardPressHandle} />
+        <CardPost onPress={CardPressHandle} />
+        <CardPost onPress={CardPressHandle} />
+        <CardPost onPress={CardPressHandle} />
+        <CardPost onPress={CardPressHandle} />
+        <CardPost onPress={CardPressHandle} />
+        <CardPost onPress={CardPressHandle} />
+      </ScrollView>
+    </>
   );
 }
 

@@ -24,6 +24,7 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
+    'no-unused-vars': 'off',
     'react/jsx-filename-extension': [
       'warn',
       {

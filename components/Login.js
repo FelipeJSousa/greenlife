@@ -1,5 +1,7 @@
 import { Card, Button, TextInput, Title, Snackbar } from 'react-native-paper';
 import React, { useState } from 'react';
+import { SafeAreaView, View, Dimensions } from 'react-native';
+import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 
 function Login({ navigation }) {
   const [visivel, setVisivel] = useState(false);
@@ -23,27 +25,57 @@ function Login({ navigation }) {
   };
 
   return (
-    <>
-      <Card>
-        <Card.Content>
-          <Title>Acessar o Aplicativo</Title>
-          <TextInput
-            mode="outlined"
-            label="Email"
-            placeholder="Digite seu emmail"
-            onChangeText={setEmail}
-          />
-          <TextInput
-            mode="outlined"
-            label="senha"
-            placeholder="Digite sua senha"
-            onChangeText={setSenha}
-          />
-          <Button icon="arrow-right" mode="contained" onPress={acessar}>
-            Acessar
-          </Button>
-        </Card.Content>
-      </Card>
+    <View style={{ flex: 1, paddingTop: getStatusBarHeight() }}>
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <Title
+          style={{
+            fontSize: 50,
+            lineHeight: 50,
+            textAlign: 'center',
+          }}
+        >
+          Green Life
+        </Title>
+      </View>
+      <View style={{ flex: 2, justifyContent: 'space-evenly' }}>
+        <TextInput
+          mode="outlined"
+          label="Email"
+          placeholder="Digite seu emmail"
+          onChangeText={setEmail}
+        />
+        <TextInput
+          mode="outlined"
+          label="senha"
+          placeholder="Digite sua senha"
+          onChangeText={setSenha}
+        />
+      </View>
+      <View
+        style={{
+          flex: 2,
+          justifyContent: 'space-evenly',
+          flexDirection: 'column',
+        }}
+      >
+        <Button
+          icon="arrow-right"
+          mode="contained"
+          onPress={acessar}
+          contentStyle={{ flexDirection: 'row-reverse' }}
+        >
+          Acessar
+        </Button>
+        <Button
+          icon="arrow-right"
+          mode="contained"
+          onPress={acessar}
+          contentStyle={{ flexDirection: 'row-reverse' }}
+          color="green"
+        >
+          Cadastrar
+        </Button>
+      </View>
       <Snackbar
         visible={visivel}
         onDismiss={fecharSnack}
@@ -51,7 +83,7 @@ function Login({ navigation }) {
       >
         Nome de usuário e/ou senha incorretos!
       </Snackbar>
-    </>
+    </View>
   );
 }
 
