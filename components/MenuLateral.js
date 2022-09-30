@@ -1,6 +1,5 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import AbaNavigator from './AbaNavigator';
 import Home from './Home';
 import Post from './Post';
 import Login from './Login';
@@ -12,7 +11,7 @@ function MenuLateral() {
     <Drawer.Navigator useLegacyImplementation initialRouteName="Home">
       <Drawer.Screen
         name="Home"
-        component={AbaNavigator}
+        component={Home}
         options={{
           title: 'Green Life',
           headerStyle: { backgroundColor: '#008C8C' },

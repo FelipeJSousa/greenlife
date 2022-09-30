@@ -18,6 +18,13 @@ module.exports = {
   },
   plugins: ['react', 'prettier'],
   rules: {
+    'prefer-const': [
+      'error',
+      {
+        destructuring: 'any',
+        ignoreReadBeforeAssign: true,
+      },
+    ],
     'prettier/prettier': [
       'error',
       {
