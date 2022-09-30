@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
+import ImageModal from 'react-native-image-modal';
+import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import firebase from '../config/firebase';
 
 let localizacao = null;
@@ -21,12 +23,11 @@ function CadastrarUsuario() {
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [imagem, setImagem] = useState('');
-  const [showImagemModal, setShowImagemModal] = useState(false);
   const [showSnackBar, setShowSnackBar] = useState(false);
   let snackBarMessage = '';
 
-  const mostrarSnack = (message = '') => {
-    snackBarMessage = message;
+  const mostrarSnack = (message) => {
+    snackBarMessage = message || '';
     setShowSnackBar(true);
   };
 
@@ -82,7 +83,6 @@ function CadastrarUsuario() {
       longitude,
       latitude,
     });
-    mostrarSnack('Salvo com sucesso!');
 
     const imageContent = await fetch(imagem);
     const imagemBlob = await imageContent.blob();
@@ -92,10 +92,14 @@ function CadastrarUsuario() {
       .ref('usuarios')
       .child(usuarioResponse.key)
       .put(imagemBlob);
+
+    mostrarSnack('Salvo com sucesso!');
   };
 
   return (
-    <ScrollView style={{ paddingHorizontal: 10 }}>
+    <ScrollView
+      style={{ paddingTop: getStatusBarHeight(), paddingHorizontal: 10 }}
+    >
       <View
         style={{
           flex: 1,
@@ -105,8 +109,8 @@ function CadastrarUsuario() {
       >
         <Title
           style={{
-            fontSize: 50,
-            lineHeight: 50,
+            fontSize: 40,
+            lineHeight: 40,
             textAlign: 'center',
           }}
         >
@@ -168,7 +172,7 @@ function CadastrarUsuario() {
               alignItems: 'center',
             }}
           >
-            <TouchableNativeFeedback onPress={setShowImagemModal}>
+            {/* <TouchableNativeFeedback onPress={setShowImagemModal(true)}>
               <Image
                 source={{ uri: imagem }}
                 style={{
@@ -177,7 +181,18 @@ function CadastrarUsuario() {
                   width: Dimensions.get('window').height / 5,
                 }}
               />
-            </TouchableNativeFeedback>
+            </TouchableNativeFeedback> */}
+            <ImageModal
+              resizeMode="contain"
+              imageBackgroundColor="#000000"
+              style={{
+                width: Dimensions.get('window').height / 5,
+                height: Dimensions.get('window').height / 5,
+              }}
+              source={{
+                uri: imagem,
+              }}
+            />
           </View>
         ) : (
           ''
