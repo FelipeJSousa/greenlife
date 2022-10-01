@@ -24,15 +24,15 @@ function CadastrarUsuario() {
   const [longitude, setLongitude] = useState('');
   const [imagem, setImagem] = useState('');
   const [showSnackBar, setShowSnackBar] = useState(false);
-  let snackBarMessage = '';
+  const [snackBarMessage, setSnackBarMessage] = useState('');
 
   const mostrarSnack = (message) => {
-    snackBarMessage = message || '';
+    setSnackBarMessage(message);
     setShowSnackBar(true);
   };
 
   const fecharSnack = () => {
-    snackBarMessage = '';
+    setSnackBarMessage('');
     setShowSnackBar(false);
   };
 
@@ -74,7 +74,21 @@ function CadastrarUsuario() {
     SolicitarPermissao();
   }, []);
 
+  const DadosEhValido = () => {
+    const result =
+      nomeCompleto !== '' &&
+      email !== '' &&
+      senha !== '' &&
+      latitude !== '' &&
+      longitude !== '' &&
+      imagem !== '';
+
+    if (result === false) mostrarSnack('Preencha todos os dados!');
+    return result;
+  };
+
   const Salvar = async () => {
+    if (DadosEhValido() === false) return;
     const db = firebase.database().ref('usuarios');
     const usuarioResponse = await db.push({
       nomeCompleto,
@@ -184,7 +198,7 @@ function CadastrarUsuario() {
             </TouchableNativeFeedback> */}
             <ImageModal
               resizeMode="contain"
-              imageBackgroundColor="#000000"
+              isTranslucent
               style={{
                 width: Dimensions.get('window').height / 5,
                 height: Dimensions.get('window').height / 5,
