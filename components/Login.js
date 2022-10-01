@@ -5,8 +5,8 @@ import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 
 function Login({ navigation }) {
   const [visivel, setVisivel] = useState(false);
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState('a');
+  const [senha, setSenha] = useState('a');
 
   const mostrarSnack = () => {
     setVisivel(true);
@@ -24,8 +24,18 @@ function Login({ navigation }) {
     }
   };
 
+  const CadastrarUsuario = () => {
+    navigation.navigate('CadastrarUsuario');
+  };
+
   return (
-    <View style={{ flex: 1, paddingTop: getStatusBarHeight() }}>
+    <View
+      style={{
+        flex: 1,
+        paddingTop: getStatusBarHeight(),
+        paddingHorizontal: 10,
+      }}
+    >
       <View style={{ flex: 1, justifyContent: 'center' }}>
         <Title
           style={{
@@ -43,12 +53,14 @@ function Login({ navigation }) {
           label="Email"
           placeholder="Digite seu emmail"
           onChangeText={setEmail}
+          value={email}
         />
         <TextInput
           mode="outlined"
           label="senha"
           placeholder="Digite sua senha"
           onChangeText={setSenha}
+          value={senha}
         />
       </View>
       <View
@@ -69,7 +81,7 @@ function Login({ navigation }) {
         <Button
           icon="arrow-right"
           mode="contained"
-          onPress={acessar}
+          onPress={CadastrarUsuario}
           contentStyle={{ flexDirection: 'row-reverse' }}
           color="green"
         >
