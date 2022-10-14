@@ -4,37 +4,38 @@ import React from 'react';
 import CadastrarUsuario from './components/CadastrarUsuario';
 import Login from './components/Login';
 import MenuLateral from './components/MenuLateral';
+import Post from './components/Post';
+import AuthContextProvider from './config/Context';
 
 const Stack = createStackNavigator();
 
-function StackNav() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CadastrarUsuario"
-        component={CadastrarUsuario}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="MenuLateral"
-        component={MenuLateral}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  );
-}
+const StackNav = () => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="Login"
+      component={Login}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="CadastrarUsuario"
+      component={CadastrarUsuario}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="MenuLateral"
+      component={MenuLateral}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen name="Post" component={Post} />
+  </Stack.Navigator>
+);
 
-function App() {
-  return (
-    <NavigationContainer>
+const App = () => (
+  <NavigationContainer>
+    <AuthContextProvider>
       <StackNav />
-    </NavigationContainer>
-  );
-}
+    </AuthContextProvider>
+  </NavigationContainer>
+);
 
 export default App;
