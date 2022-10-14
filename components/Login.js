@@ -1,27 +1,52 @@
-import { Card, Button, TextInput, Title, Snackbar } from 'react-native-paper';
-import React, { useState } from 'react';
-import { SafeAreaView, View, Dimensions } from 'react-native';
+import { Button, TextInput, Title, Snackbar } from 'react-native-paper';
+import React, { useContext, useState } from 'react';
+import { View } from 'react-native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import Firebase from '../config/Firebase';
+import { AuthContext } from '../config/Context';
 
-function Login({ navigation }) {
-  const [visivel, setVisivel] = useState(false);
-  const [email, setEmail] = useState('a');
-  const [senha, setSenha] = useState('a');
+const Login = ({ navigation }) => {
+  const [email, setEmail] = useState('felipe@mail.com');
+  const [senha, setSenha] = useState('12345678');
+  const [showSnackBar, setShowSnackBar] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
+  const { setNomeUsuario } = useContext(AuthContext);
 
-  const mostrarSnack = () => {
-    setVisivel(true);
+  const mostrarSnack = (message) => {
+    setSnackBarMessage(message);
+    setShowSnackBar(true);
+  };
+  const ocultarSnack = () => setShowSnackBar(false);
+
+  const DadosEhValido = () => {
+    const result = email !== '' && senha !== '';
+
+    if (result === false)
+      mostrarSnack('Nome de usuário e/ou senha incorretos!');
+
+    return result;
   };
 
-  const fecharSnack = () => {
-    setVisivel(false);
+  const RealizarLogin = () => {
+    Firebase.auth()
+      .signInWithEmailAndPassword(email, senha)
+      .then((value) => {
+        Firebase.database()
+          .ref(`usuarios/${value.uid}`)
+          .on('value', (snapshot) => {
+            setNomeUsuario(snapshot.val().nomeCompleto);
+          });
+        navigation.navigate('MenuLateral');
+      })
+      .catch((e) => {
+        console.log(e);
+        mostrarSnack('Usuario ou senha inválidos!');
+      });
   };
 
   const acessar = () => {
-    if (email && senha) {
-      navigation.navigate('MenuLateral');
-    } else {
-      mostrarSnack();
-    }
+    if (DadosEhValido() === false) return;
+    RealizarLogin();
   };
 
   const CadastrarUsuario = () => {
@@ -89,14 +114,14 @@ function Login({ navigation }) {
         </Button>
       </View>
       <Snackbar
-        visible={visivel}
-        onDismiss={fecharSnack}
+        visible={showSnackBar}
+        onDismiss={ocultarSnack}
         action={{ label: 'Fechar' }}
       >
-        Nome de usuário e/ou senha incorretos!
+        {snackBarMessage}
       </Snackbar>
     </View>
   );
-}
+};
 
 export default Login;
