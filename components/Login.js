@@ -1,16 +1,14 @@
 import { Button, TextInput, Title, Snackbar } from 'react-native-paper';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import Firebase from '../config/Firebase';
-import { AuthContext } from '../config/Context';
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('felipe@mail.com');
   const [senha, setSenha] = useState('12345678');
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
-  const { setNomeUsuario } = useContext(AuthContext);
 
   const mostrarSnack = (message) => {
     setSnackBarMessage(message);
@@ -30,12 +28,7 @@ const Login = ({ navigation }) => {
   const RealizarLogin = () => {
     Firebase.auth()
       .signInWithEmailAndPassword(email, senha)
-      .then((value) => {
-        Firebase.database()
-          .ref(`usuarios/${value.uid}`)
-          .on('value', (snapshot) => {
-            setNomeUsuario(snapshot.val().nomeCompleto);
-          });
+      .then(() => {
         navigation.navigate('MenuLateral');
       })
       .catch((e) => {

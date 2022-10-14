@@ -14,21 +14,8 @@ import Firebase from '../config/Firebase';
 const Drawer = createDrawerNavigator();
 
 const MenuLateral = () => {
-  const { user, nomeUsuario, Logout } = useContext(AuthContext);
+  const { user, Logout } = useContext(AuthContext);
   const [userImage, setUserImage] = useState(null);
-  const GetUserProfile = () => {
-    Firebase.storage()
-      .ref(`/usuarios/${user.uid}`)
-      .getDownloadURL()
-      .then((url) => {
-        setUserImage(url);
-      })
-      .catch((e) => console.log(e));
-  };
-
-  useEffect(() => {
-    GetUserProfile();
-  }, []);
 
   const Usuario = () => (
     <View
@@ -49,9 +36,9 @@ const MenuLateral = () => {
           marginRight: 10,
         }}
       >
-        {nomeUsuario}
+        {user?.nomeCompleto ?? ''}
       </Text>
-      <BlockImage uri={userImage} width={40} height={40} />
+      <BlockImage uri={user?.profileImage} width={40} height={40} />
     </View>
   );
 

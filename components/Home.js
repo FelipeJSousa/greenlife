@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { AuthContext } from '../config/Context';
 import CardPost from './CardPost';
 
 const styles = StyleSheet.create({
@@ -9,9 +10,27 @@ const styles = StyleSheet.create({
 
 const Home = () => {
   const navigation = useNavigation();
+  const { Logout } = useContext(AuthContext);
   const CardPressHandle = () => {
     navigation?.navigate('Post');
   };
+
+  navigation.addListener('beforeRemove', (e) => {
+    e.preventDefault();
+
+    Alert.alert('Realizar logout', 'Deseja sair?', [
+      { text: 'Ficar', style: 'cancel', onPress: () => {} },
+      {
+        text: 'Sair',
+        style: 'destructive',
+        onPress: () => {
+          navigation.dispatch(e.data.action);
+          Logout();
+        },
+      },
+    ]);
+  });
+
   return (
     <>
       <Text
