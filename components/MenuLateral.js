@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { Text } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -7,26 +7,52 @@ import {
 } from '@react-navigation/drawer';
 import { AntDesign } from '@expo/vector-icons';
 import Home from './Home';
-import Post from './Post';
 import { AuthContext } from '../config/Context';
+import BlockImage from './BlockImage';
+import Firebase from '../config/Firebase';
 
 const Drawer = createDrawerNavigator();
 
 const MenuLateral = () => {
-  const { nomeUsuario, Logout } = useContext(AuthContext);
+  const { user, nomeUsuario, Logout } = useContext(AuthContext);
+  const [userImage, setUserImage] = useState(null);
+  const GetUserProfile = () => {
+    Firebase.storage()
+      .ref(`/usuarios/${user.uid}`)
+      .getDownloadURL()
+      .then((url) => {
+        setUserImage(url);
+      })
+      .catch((e) => console.log(e));
+  };
+
+  useEffect(() => {
+    GetUserProfile();
+  }, []);
 
   const Usuario = () => (
-    <Text
+    <View
       style={{
-        color: 'white',
+        flex: 1,
+        flexDirection: 'row',
+        width: 150,
         padding: 10,
-        marginRight: 20,
-        fontWeight: '500',
-        fontSize: 15,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
       }}
     >
-      {nomeUsuario}
-    </Text>
+      <Text
+        style={{
+          color: 'white',
+          fontWeight: '500',
+          fontSize: 15,
+          marginRight: 10,
+        }}
+      >
+        {nomeUsuario}
+      </Text>
+      <BlockImage uri={userImage} width={40} height={40} />
+    </View>
   );
 
   const DrawerItems = () => {

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Image } from 'react-native';
 
-function BlockImage({ height, width, border }) {
+function BlockImage({ uri = null, height, width, border }) {
   const value = Math.round(Math.random(1) * 1000);
 
   return (
     <Image
       source={{
-        uri: `https://picsum.photos/${value}`,
+        uri: uri ?? `https://picsum.photos/${value}`,
       }}
       style={{
         height: height ?? 120,
