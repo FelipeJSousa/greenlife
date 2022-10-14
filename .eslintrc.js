@@ -46,5 +46,13 @@ module.exports = {
     'no-param-reassign': 'off',
     'no-console': 'off',
     semi: [2, 'always'],
+    'react/function-component-definition': [
+      2,
+      {
+        namedComponents: 'arrow-function',
+        unnamedComponents: 'arrow-function',
+      },
+    ],
+    'react/no-unstable-nested-components': ['off', { allowAsProps: true }],
   },
 };
