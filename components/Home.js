@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
   view: { flex: 1, padding: 10 },
 });
 
-function Home() {
+const Home = () => {
   const navigation = useNavigation();
   const CardPressHandle = () => {
     navigation?.navigate('Post');
@@ -36,6 +36,6 @@ function Home() {
       </ScrollView>
     </>
   );
-}
+};
 
 export default Home;

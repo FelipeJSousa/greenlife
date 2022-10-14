@@ -9,7 +9,7 @@ import {
 import { Entypo, AntDesign } from '@expo/vector-icons';
 import BlockImage from './BlockImage';
 
-function Post() {
+const Post = () => {
   const randomValue = () => Math.round(Math.random(1) * 1000);
   const initLike = randomValue();
   const initComents = randomValue();
@@ -92,6 +92,6 @@ function Post() {
       </View>
     </ScrollView>
   );
-}
+};
 
 export default Post;
