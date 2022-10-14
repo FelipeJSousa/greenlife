@@ -4,11 +4,13 @@ import { View, Text, ScrollView, Dimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import ImageModal from 'react-native-image-modal';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import { useNavigation } from '@react-navigation/native';
 import Firebase from '../config/Firebase';
 
 const localizacao = null;
 
 const CadastrarUsuario = () => {
+  const navigation = useNavigation();
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -71,7 +73,7 @@ const CadastrarUsuario = () => {
 
         Firebase.storage().ref(`usuarios`).child(uid).put(imagemBlob);
 
-        mostrarSnack('Salvo com sucesso!');
+        navigation.navigate('Login');
       })
       .catch((error) => {
         if (error.code === 'auth/email-already-in-use')
