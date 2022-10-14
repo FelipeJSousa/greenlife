@@ -1,22 +1,15 @@
 import { Button, TextInput, Title, Snackbar } from 'react-native-paper';
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  Dimensions,
-  TouchableNativeFeedback,
-} from 'react-native';
+import { View, Text, ScrollView, Dimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import ImageModal from 'react-native-image-modal';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
-import firebase from '../config/firebase';
+import Firebase from '../config/Firebase';
 
 let localizacao = null;
 
-function CadastrarUsuario() {
+const CadastrarUsuario = () => {
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -34,10 +27,6 @@ function CadastrarUsuario() {
   const fecharSnack = () => {
     setSnackBarMessage('');
     setShowSnackBar(false);
-  };
-
-  const Cadastrar = () => {
-    mostrarSnack();
   };
 
   const SolicitarPermissao = async () => {
@@ -89,25 +78,36 @@ function CadastrarUsuario() {
 
   const Salvar = async () => {
     if (DadosEhValido() === false) return;
-    const db = firebase.database().ref('usuarios');
-    const usuarioResponse = await db.push({
-      nomeCompleto,
-      email,
-      senha,
-      longitude,
-      latitude,
-    });
 
-    const imageContent = await fetch(imagem);
-    const imagemBlob = await imageContent.blob();
+    await Firebase.auth()
+      .createUserWithEmailAndPassword(email, senha)
+      .then(async (value) => {
+        const { uid } = value;
 
-    firebase
-      .storage()
-      .ref('usuarios')
-      .child(usuarioResponse.key)
-      .put(imagemBlob);
+        const db = Firebase.database().ref(`usuarios`);
+        await db.child(uid).set({
+          nomeCompleto,
+          email,
+          longitude,
+          latitude,
+        });
 
-    mostrarSnack('Salvo com sucesso!');
+        const imageContent = await fetch(imagem);
+        const imagemBlob = await imageContent.blob();
+
+        Firebase.storage().ref(`usuarios`).child(uid).put(imagemBlob);
+
+        mostrarSnack('Salvo com sucesso!');
+      })
+      .catch((error) => {
+        if (error.code === 'auth/email-already-in-use')
+          mostrarSnack('Este email já foi cadastrado!');
+        else if (error.code === 'auth/invalid-email')
+          mostrarSnack('O email informado é inválido!');
+        else if (error.code === 'auth/weak-password')
+          mostrarSnack('A senha deve ter ao menos 8 caracteres');
+        else mostrarSnack(`Erro ao cadastrar o usuário${error.code}`);
+      });
   };
 
   return (
@@ -186,16 +186,6 @@ function CadastrarUsuario() {
               alignItems: 'center',
             }}
           >
-            {/* <TouchableNativeFeedback onPress={setShowImagemModal(true)}>
-              <Image
-                source={{ uri: imagem }}
-                style={{
-                  flex: 1,
-                  height: Dimensions.get('window').height / 5,
-                  width: Dimensions.get('window').height / 5,
-                }}
-              />
-            </TouchableNativeFeedback> */}
             <ImageModal
               resizeMode="contain"
               isTranslucent
@@ -229,6 +219,6 @@ function CadastrarUsuario() {
       </Snackbar>
     </ScrollView>
   );
-}
+};
 
 export default CadastrarUsuario;
