@@ -15,21 +15,24 @@ const Home = () => {
     navigation?.navigate('Post');
   };
 
-  navigation.addListener('beforeRemove', (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    navigation.removeListener('beforeRemove');
+    navigation.addListener('beforeRemove', (e) => {
+      e.preventDefault();
 
-    Alert.alert('Realizar logout', 'Deseja sair?', [
-      { text: 'Ficar', style: 'cancel', onPress: () => {} },
-      {
-        text: 'Sair',
-        style: 'destructive',
-        onPress: () => {
-          navigation.dispatch(e.data.action);
-          Logout();
+      Alert.alert('Realizar logout', 'Deseja sair?', [
+        { text: 'Ficar', style: 'cancel', onPress: () => {} },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: () => {
+            navigation.dispatch(e.data.action);
+            Logout();
+          },
         },
-      },
-    ]);
-  });
+      ]);
+    });
+  }, []);
 
   return (
     <>

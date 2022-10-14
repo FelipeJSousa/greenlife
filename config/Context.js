@@ -6,25 +6,20 @@ export const AuthContext = createContext();
 
 const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [nomeUsuario, setNomeUsuario] = useState(null);
   const navigation = useNavigation();
 
   const Logout = (navigate = true) => {
-    setUser(null);
-    setNomeUsuario(null);
     Firebase.auth().signOut();
+    setUser(null);
     if (navigate) navigation?.navigate('Login');
   };
 
   const GetProfileImage = async (uid) => {
     const storage = Firebase.storage().ref(`/usuarios/${uid}`);
     let profileImage = null;
-    await storage
-      .getDownloadURL()
-      .then((url) => {
-        profileImage = url;
-      })
-      .catch((e) => console.log(e));
+    await storage.getDownloadURL().then((url) => {
+      profileImage = url;
+    });
     return Promise.resolve(profileImage);
   };
 
@@ -40,19 +35,19 @@ const AuthContextProvider = ({ children }) => {
           profileImage,
         };
       });
-    return userInfo;
+    return Promise.resolve(userInfo);
   };
 
   useEffect(() => {
-    Firebase.auth().onAuthStateChanged(async (usuarioLogado) => {
-      if (usuarioLogado?.uid === null) {
+    Firebase.auth().onIdTokenChanged(async (usuarioLogado) => {
+      if (usuarioLogado === null || usuarioLogado.uid === null) {
         return;
       }
+      usuarioLogado.getIdToken();
 
       const { uid } = usuarioLogado;
 
       const userInfo = await GetUserInfo(uid);
-      console.log(userInfo);
       setUser({ uid, ...userInfo });
     });
   }, []);

@@ -32,7 +32,6 @@ const Login = ({ navigation }) => {
         navigation.navigate('MenuLateral');
       })
       .catch((e) => {
-        console.log(e);
         mostrarSnack('Usuario ou senha inválidos!');
       });
   };

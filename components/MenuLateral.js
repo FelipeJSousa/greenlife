@@ -38,7 +38,9 @@ const MenuLateral = () => {
       >
         {user?.nomeCompleto ?? ''}
       </Text>
-      <BlockImage uri={user?.profileImage} width={40} height={40} />
+      {user?.profileImage && (
+        <BlockImage uri={user?.profileImage} width={40} height={40} />
+      )}
     </View>
   );
 
