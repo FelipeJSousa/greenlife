@@ -2,19 +2,16 @@ import { Button, TextInput, Title, Snackbar } from 'react-native-paper';
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
 import ImageModal from 'react-native-image-modal';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import Firebase from '../config/Firebase';
 
-let localizacao = null;
+const localizacao = null;
 
 const CadastrarUsuario = () => {
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
   const [imagem, setImagem] = useState('');
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
@@ -30,9 +27,7 @@ const CadastrarUsuario = () => {
   };
 
   const SolicitarPermissao = async () => {
-    const imagePermissao = await ImagePicker.getMediaLibraryPermissionsAsync();
-    const localizacaoPermissao =
-      await Location.requestForegroundPermissionsAsync();
+    await ImagePicker.getMediaLibraryPermissionsAsync();
   };
 
   const SelecionarFoto = async () => {
@@ -45,32 +40,13 @@ const CadastrarUsuario = () => {
     if (!imagemResult.cancelled) setImagem(imagemResult.uri);
   };
 
-  const SelecionarLocalizacao = async () => {
-    await SolicitarPermissao();
-    localizacao = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.BestForNavigation,
-      },
-      (result) => {
-        setLatitude(result.coords.latitude);
-        setLongitude(result.coords.longitude);
-        localizacao?.remove();
-      }
-    );
-  };
-
   useEffect(() => {
     SolicitarPermissao();
   }, []);
 
   const DadosEhValido = () => {
     const result =
-      nomeCompleto !== '' &&
-      email !== '' &&
-      senha !== '' &&
-      latitude !== '' &&
-      longitude !== '' &&
-      imagem !== '';
+      nomeCompleto !== '' && email !== '' && senha !== '' && imagem !== '';
 
     if (result === false) mostrarSnack('Preencha todos os dados!');
     return result;
@@ -88,8 +64,6 @@ const CadastrarUsuario = () => {
         await db.child(uid).set({
           nomeCompleto,
           email,
-          longitude,
-          latitude,
         });
 
         const imageContent = await fetch(imagem);
@@ -121,6 +95,17 @@ const CadastrarUsuario = () => {
           paddingVertical: 50,
         }}
       >
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <Title
+            style={{
+              fontSize: 50,
+              lineHeight: 50,
+              textAlign: 'center',
+            }}
+          >
+            Green Life
+          </Title>
+        </View>
         <Title
           style={{
             fontSize: 40,
@@ -128,7 +113,7 @@ const CadastrarUsuario = () => {
             textAlign: 'center',
           }}
         >
-          Cadastrar Usuario
+          Cadastro
         </Title>
       </View>
       <View
@@ -157,20 +142,6 @@ const CadastrarUsuario = () => {
           placeholder="Digite sua senha"
           onChangeText={setSenha}
         />
-        <Button
-          icon="map"
-          mode="outlined"
-          style={{ marginVertical: 10 }}
-          onPress={SelecionarLocalizacao}
-        >
-          Registrar Dados de Localização
-        </Button>
-        <Text style={{ fontSize: 20, paddingVertical: 10, color: 'blue' }}>
-          latitude: {latitude || ''}
-        </Text>
-        <Text style={{ fontSize: 20, paddingVertical: 10, color: 'blue' }}>
-          longitude: {longitude || ''}
-        </Text>
         <Button
           icon="image"
           mode="outlined"
