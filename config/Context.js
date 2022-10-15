@@ -8,9 +8,12 @@ const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const navigation = useNavigation();
 
+  const [run, setRun] = useState(true);
+
   const Logout = (navigate = true) => {
     Firebase.auth().signOut();
     setUser(null);
+    setRun(true);
     if (navigate) navigation?.navigate('Login');
   };
 
@@ -40,9 +43,13 @@ const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {
     Firebase.auth().onIdTokenChanged(async (usuarioLogado) => {
+      if (!run) {
+        return;
+      }
       if (usuarioLogado === null || usuarioLogado.uid === null) {
         return;
       }
+      setRun(false);
       usuarioLogado.getIdToken();
 
       const { uid } = usuarioLogado;
