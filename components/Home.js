@@ -1,11 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useEffect } from 'react';
-import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { View, Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { Button } from 'react-native-paper';
 import { AuthContext } from '../config/Context';
 import CardPost from './CardPost';
 
 const styles = StyleSheet.create({
   view: { flex: 1, padding: 10 },
+  feedList: { flex: 5, padding: 10 },
 });
 
 const Home = () => {
@@ -15,6 +17,9 @@ const Home = () => {
     navigation?.navigate('Post');
   };
 
+  const CriarPostagem = () => {
+    navigation.navigate('NovoPost');
+  };
   useEffect(() => {
     navigation.removeListener('beforeRemove');
     navigation.addListener('beforeRemove', (e) => {
@@ -36,17 +41,36 @@ const Home = () => {
 
   return (
     <>
+      <View style={{ alignItems: 'center' }}>
+        <Button
+          icon="plus"
+          mode="text"
+          onPress={CriarPostagem}
+          contentStyle={{
+            flexDirection: 'row-reverse',
+            color: '#008C8C',
+            borderRadius: 20,
+            borderColor: '#008C8C',
+            borderStyle: 'solid',
+            borderWidth: 5,
+          }}
+          color="#008C8C"
+          style={{ width: 250, margin: 10 }}
+        >
+          Nova Postagem
+        </Button>
+      </View>
       <Text
         style={{
-          fontSize: 50,
-          lineHeight: 50,
+          fontSize: 25,
+          lineHeight: 25,
           textAlign: 'center',
-          padding: 25,
+          padding: 10,
         }}
       >
-        Feed
+        Ultimas postagens
       </Text>
-      <ScrollView style={{ flex: 5, padding: 10 }}>
+      <ScrollView style={styles.feedList}>
         <CardPost onPress={CardPressHandle} />
         <CardPost onPress={CardPressHandle} />
         <CardPost onPress={CardPressHandle} />

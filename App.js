@@ -4,6 +4,7 @@ import React from 'react';
 import CadastrarUsuario from './components/CadastrarUsuario';
 import Login from './components/Login';
 import MenuLateral from './components/MenuLateral';
+import NovoPost from './components/NovoPost';
 import Post from './components/Post';
 import AuthContextProvider from './config/Context';
 
@@ -27,6 +28,7 @@ const StackNav = () => (
       options={{ headerShown: false }}
     />
     <Stack.Screen name="Post" component={Post} />
+    <Stack.Screen name="NovoPost" component={NovoPost} />
   </Stack.Navigator>
 );
 
