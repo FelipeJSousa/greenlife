@@ -9,6 +9,7 @@ const Login = ({ navigation }) => {
   const [senha, setSenha] = useState('12345678');
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
+  const [showLoading, setLoading] = useState(false);
 
   const mostrarSnack = (message) => {
     setSnackBarMessage(message);
@@ -29,7 +30,10 @@ const Login = ({ navigation }) => {
     Firebase.auth()
       .signInWithEmailAndPassword(email, senha)
       .then(() => {
-        navigation.navigate('MenuLateral');
+        setTimeout(() => {
+          setLoading(false);
+          navigation.navigate('MenuLateral');
+        }, 1000);
       })
       .catch((e) => {
         mostrarSnack('Usuario ou senha inválidos!');
@@ -37,6 +41,7 @@ const Login = ({ navigation }) => {
   };
 
   const acessar = () => {
+    setLoading(true);
     if (DadosEhValido() === false) return;
     RealizarLogin();
   };
@@ -92,6 +97,7 @@ const Login = ({ navigation }) => {
           mode="contained"
           onPress={acessar}
           contentStyle={{ flexDirection: 'row-reverse' }}
+          loading={showLoading}
         >
           Acessar
         </Button>

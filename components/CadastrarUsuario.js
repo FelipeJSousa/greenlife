@@ -17,6 +17,7 @@ const CadastrarUsuario = () => {
   const [imagem, setImagem] = useState('');
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
+  const [showLoading, setLoading] = useState(false);
 
   const mostrarSnack = (message) => {
     setSnackBarMessage(message);
@@ -55,7 +56,11 @@ const CadastrarUsuario = () => {
   };
 
   const Salvar = async () => {
-    if (DadosEhValido() === false) return;
+    setLoading(true);
+    if (DadosEhValido() === false) {
+      setLoading(false);
+      return;
+    }
 
     await Firebase.auth()
       .createUserWithEmailAndPassword(email, senha)
@@ -73,6 +78,7 @@ const CadastrarUsuario = () => {
 
         Firebase.storage().ref(`usuarios`).child(uid).put(imagemBlob);
 
+        setLoading(false);
         navigation.navigate('Login');
       })
       .catch((error) => {
@@ -179,6 +185,7 @@ const CadastrarUsuario = () => {
           mode="contained"
           onPress={Salvar}
           style={{ marginVertical: 10 }}
+          loading={showLoading}
         >
           Salvar Dados
         </Button>
