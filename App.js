@@ -17,11 +17,7 @@ const StackNav = () => (
       component={Login}
       options={{ headerShown: false }}
     />
-    <Stack.Screen
-      name="CadastrarUsuario"
-      component={CadastrarUsuario}
-      options={{ headerShown: false }}
-    />
+    <Stack.Screen name="CadastrarUsuario" component={CadastrarUsuario} />
     <Stack.Screen
       name="MenuLateral"
       component={MenuLateral}
