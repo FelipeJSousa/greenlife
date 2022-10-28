@@ -85,6 +85,10 @@ const NovoPost = () => {
       });
   };
 
+  const SelecionarEndereco = () => {
+    navigation.navigate('MapMarker');
+  };
+
   return (
     <ScrollView
       style={{ paddingTop: getStatusBarHeight(), paddingHorizontal: 10 }}
@@ -132,6 +136,14 @@ const NovoPost = () => {
           placeholder="Digite o endereço do local"
           onChangeText={setSenha}
         />
+        <Button
+          icon="map"
+          mode="outlined"
+          style={{ marginVertical: 10 }}
+          onPress={SelecionarEndereco}
+        >
+          Inserir Endereço
+        </Button>
         <Button
           icon="image"
           mode="outlined"

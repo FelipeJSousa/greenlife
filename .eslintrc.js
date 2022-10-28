@@ -45,6 +45,7 @@ module.exports = {
     'react/prop-types': 'off',
     'no-param-reassign': 'off',
     'no-console': 'off',
+    'no-use-before-define': 'off',
     semi: [2, 'always'],
     'react/function-component-definition': [
       2,

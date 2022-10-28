@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Text, View } from 'react-native';
 import {
   createDrawerNavigator,
@@ -9,13 +9,11 @@ import { AntDesign } from '@expo/vector-icons';
 import Home from './Home';
 import { AuthContext } from '../config/Context';
 import BlockImage from './BlockImage';
-import Firebase from '../config/Firebase';
 
 const Drawer = createDrawerNavigator();
 
 const MenuLateral = () => {
   const { user, Logout } = useContext(AuthContext);
-  const [userImage, setUserImage] = useState(null);
 
   const Usuario = () => (
     <View
