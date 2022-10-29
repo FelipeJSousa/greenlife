@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/drawer';
 import { AntDesign } from '@expo/vector-icons';
 import Home from './Home';
-import { AuthContext } from '../config/Context';
+import { AuthContext } from '../providers/AuthContextProvider';
 import BlockImage from './BlockImage';
 
 const Drawer = createDrawerNavigator();

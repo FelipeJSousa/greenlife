@@ -14,8 +14,8 @@ const firebaseConfig = {
   projectId: 'greenlife-0808',
   storageBucket: 'greenlife-0808.appspot.com',
   messagingSenderId: '499556767157',
-  // appId: "1:499556767157:web:63766148d680551e7e75fc",
   measurementId: 'G-WD3YJGV6YY',
+  // appId: "1:499556767157:web:63766148d680551e7e75fc",
 };
 
 // Initialize Firebase

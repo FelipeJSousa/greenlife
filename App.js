@@ -1,7 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import {
   createStackNavigator,
-  TransitionPreset,
   TransitionPresets,
 } from '@react-navigation/stack';
 import React from 'react';
@@ -12,7 +11,8 @@ import MapMarker from './components/MapMarker';
 import MenuLateral from './components/MenuLateral';
 import NovoPost from './components/NovoPost';
 import Post from './components/Post';
-import AuthContextProvider from './config/Context';
+import AuthContextProvider from './providers/AuthContextProvider';
+import { NovoPostContextProvider } from './providers/NovoPostContextProvider';
 
 const Stack = createStackNavigator();
 const isAndroid = Platform.OS === 'android';
@@ -38,7 +38,11 @@ const StackNav = () => (
         ...(isAndroid && TransitionPresets.ModalPresentationIOS),
       }}
     >
-      <Stack.Screen name="MapMarker" component={MapMarker} />
+      <Stack.Screen
+        name="MapMarker"
+        options={{ title: 'Selecione o endereço' }}
+        component={MapMarker}
+      />
     </Stack.Group>
   </Stack.Navigator>
 );
@@ -46,7 +50,9 @@ const StackNav = () => (
 const App = () => (
   <NavigationContainer>
     <AuthContextProvider>
-      <StackNav />
+      <NovoPostContextProvider>
+        <StackNav />
+      </NovoPostContextProvider>
     </AuthContextProvider>
   </NavigationContainer>
 );

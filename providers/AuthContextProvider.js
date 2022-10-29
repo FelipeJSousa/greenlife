@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, createContext } from 'react';
-import Firebase from './Firebase';
+import Firebase from '../config/Firebase';
 
 export const AuthContext = createContext();
 

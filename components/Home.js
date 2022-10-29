@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useEffect } from 'react';
 import { View, Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-paper';
-import { AuthContext } from '../config/Context';
+import { AuthContext } from '../providers/AuthContextProvider';
 import CardPost from './CardPost';
 
 const styles = StyleSheet.create({
@@ -26,7 +26,13 @@ const Home = () => {
       e.preventDefault();
 
       Alert.alert('Realizar logout', 'Deseja sair?', [
-        { text: 'Ficar', style: 'cancel', onPress: () => {} },
+        {
+          text: 'Ficar',
+          style: 'cancel',
+          onPress: () => {
+            console.log();
+          },
+        },
         {
           text: 'Sair',
           style: 'destructive',

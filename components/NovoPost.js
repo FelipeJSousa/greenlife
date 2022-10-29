@@ -1,11 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Dimensions, ScrollView, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { Button, Snackbar, TextInput, Title } from 'react-native-paper';
 import ImageModal from 'react-native-image-modal';
 import Firebase from '../config/Firebase';
+import { NovoPostContext } from '../providers/NovoPostContextProvider';
 
 const NovoPost = () => {
   const navigation = useNavigation();
@@ -15,6 +16,7 @@ const NovoPost = () => {
   const [imagens, setImagens] = useState([]);
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
+  const { enderecoMap } = useContext(NovoPostContext);
 
   const mostrarSnack = (message) => {
     setSnackBarMessage(message);
@@ -70,7 +72,7 @@ const NovoPost = () => {
         const imageContent = await fetch(imagens);
         const imagemBlob = await imageContent.blob();
 
-        Firebase.storage().ref(`usuarios`).child(uid).put(imagemBlob);
+        Firebase.storage().ref('usuarios').child(uid).put(imagemBlob);
 
         navigation.navigate('Login');
       })
@@ -130,12 +132,6 @@ const NovoPost = () => {
           onChangeText={setDescricao}
           keyboardType="email-address"
         />
-        <TextInput
-          mode="outlined"
-          label="Endereço"
-          placeholder="Digite o endereço do local"
-          onChangeText={setSenha}
-        />
         <Button
           icon="map"
           mode="outlined"
@@ -144,6 +140,19 @@ const NovoPost = () => {
         >
           Inserir Endereço
         </Button>
+        {enderecoMap && (
+          <View>
+            {enderecoMap &&
+              Object.entries(enderecoMap).map(([key, value]) => (
+                <Text>
+                  <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+                    {key}:
+                  </Text>{' '}
+                  {value}
+                </Text>
+              ))}
+          </View>
+        )}
         <Button
           icon="image"
           mode="outlined"
@@ -153,15 +162,7 @@ const NovoPost = () => {
           Selecionar foto de perfil
         </Button>
         {imagens ? (
-          <ScrollView
-            horizontal
-            style={
-              {
-                // flex: 1,
-                // alignItems: 'center',
-              }
-            }
-          >
+          <ScrollView horizontal>
             {imagens?.length > 0 &&
               imagens?.map((ele) => {
                 console.log(ele);
