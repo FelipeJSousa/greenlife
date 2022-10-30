@@ -1,22 +1,22 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useContext, useEffect, useState } from 'react';
-import { Dimensions, ScrollView, Text, View } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Dimensions, FlatList, ScrollView, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
-import { Button, Snackbar, TextInput, Title } from 'react-native-paper';
+import { Button, Modal, Snackbar, TextInput, Title } from 'react-native-paper';
 import ImageModal from 'react-native-image-modal';
 import Firebase from '../config/Firebase';
 import { NovoPostContext } from '../providers/NovoPostContextProvider';
+import Badge from './Badge';
 
 const NovoPost = () => {
   const navigation = useNavigation();
-  const [nomeCompleto, setNomeLocal] = useState('');
-  const [email, setDescricao] = useState('');
-  const [senha, setSenha] = useState('');
+  const [nomeLocal, setNomeLocal] = useState('');
+  const [descricao, setDescricao] = useState('');
   const [imagens, setImagens] = useState([]);
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
-  const { enderecoMap } = useContext(NovoPostContext);
+  const { enderecoMap, setEnderecoMap } = useContext(NovoPostContext);
 
   const mostrarSnack = (message) => {
     setSnackBarMessage(message);
@@ -49,7 +49,7 @@ const NovoPost = () => {
 
   const DadosEhValido = () => {
     const result =
-      nomeCompleto !== '' && email !== '' && senha !== '' && imagens !== '';
+      nomeLocal !== '' && descricao !== '' && imagens !== '' && !!enderecoMap;
 
     if (result === false) mostrarSnack('Preencha todos os dados!');
     return result;
@@ -57,35 +57,34 @@ const NovoPost = () => {
 
   const Salvar = async () => {
     if (DadosEhValido() === false) return;
+    const content = {
+      nomeLocal,
+      descricao,
+      endereco: enderecoMap,
+      dataInclusao: Date(),
+    };
 
-    await Firebase.auth()
-      .createUserWithEmailAndPassword(email, senha)
-      .then(async (value) => {
-        const { uid } = value;
+    const db = Firebase.database().ref('posts');
+    const postResponse = await db.push(content);
 
-        const db = Firebase.database().ref(`usuarios`);
-        await db.child(uid).set({
-          nomeCompleto,
-          email,
-        });
+    const imageContent = await fetch(imagens);
+    const imagemBlob = await imageContent.blob();
 
-        const imageContent = await fetch(imagens);
-        const imagemBlob = await imageContent.blob();
+    Firebase.storage().ref('posts').child(postResponse.key).put(imagemBlob);
 
-        Firebase.storage().ref('usuarios').child(uid).put(imagemBlob);
-
-        navigation.navigate('Login');
-      })
-      .catch((error) => {
-        if (error.code === 'auth/email-already-in-use')
-          mostrarSnack('Este email já foi cadastrado!');
-        else if (error.code === 'auth/invalid-email')
-          mostrarSnack('O email informado é inválido!');
-        else if (error.code === 'auth/weak-password')
-          mostrarSnack('A senha deve ter ao menos 8 caracteres');
-        else mostrarSnack(`Erro ao cadastrar o usuário${error.code}`);
-      });
+    navigation.goBack();
   };
+
+  const dispose = useCallback(() => {
+    navigation.removeListener('beforeRemove');
+    navigation.addListener('beforeRemove', (e) => {
+      e.preventDefault();
+      setEnderecoMap(null);
+      navigation.dispatch(e.data.action);
+    });
+  }, []);
+
+  useEffect(() => dispose(), []);
 
   const SelecionarEndereco = () => {
     navigation.navigate('MapMarker');
@@ -159,26 +158,23 @@ const NovoPost = () => {
           style={{ marginVertical: 10 }}
           onPress={SelecionarNovaFoto}
         >
-          Selecionar foto de perfil
+          Selecionar Foto do local
         </Button>
         {imagens ? (
           <ScrollView horizontal>
             {imagens?.length > 0 &&
-              imagens?.map((ele) => {
-                console.log(ele);
-                return (
-                  <ImageModal
-                    resizeMode="contain"
-                    style={{
-                      width: Dimensions.get('window').height / 5,
-                      height: Dimensions.get('window').height / 5,
-                    }}
-                    source={{
-                      uri: ele,
-                    }}
-                  />
-                );
-              })}
+              imagens?.map((ele) => (
+                <ImageModal
+                  resizeMode="contain"
+                  style={{
+                    width: Dimensions.get('window').height / 5,
+                    height: Dimensions.get('window').height / 5,
+                  }}
+                  source={{
+                    uri: ele,
+                  }}
+                />
+              ))}
           </ScrollView>
         ) : (
           ''

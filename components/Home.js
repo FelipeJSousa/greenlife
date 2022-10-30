@@ -29,9 +29,6 @@ const Home = () => {
         {
           text: 'Ficar',
           style: 'cancel',
-          onPress: () => {
-            console.log();
-          },
         },
         {
           text: 'Sair',

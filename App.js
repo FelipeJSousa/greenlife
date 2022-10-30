@@ -31,7 +31,11 @@ const StackNav = () => (
       options={{ headerShown: false }}
     />
     <Stack.Screen name="Post" component={Post} />
-    <Stack.Screen name="NovoPost" component={NovoPost} />
+    <Stack.Screen
+      name="NovoPost"
+      options={{ title: 'Novo Post' }}
+      component={NovoPost}
+    />
     <Stack.Group
       screenOptions={{
         gestureEnabled: true,

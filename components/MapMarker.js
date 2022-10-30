@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, Text } from 'react-native-paper';
 import { NovoPostContext } from '../providers/NovoPostContextProvider';
 
 const MapMarker = () => {
@@ -28,7 +28,6 @@ const MapMarker = () => {
       }
     );
   };
-  // , []);
 
   useEffect(() => {
     ObterLocalizacaoAtual();
@@ -37,36 +36,45 @@ const MapMarker = () => {
   return (
     <View style={styles.container}>
       {defaultRegion ? (
-        <MapView
-          onPress={async (e) => {
-            const coord = {
-              latitude: e.nativeEvent.coordinate.latitude,
-              longitude: e.nativeEvent.coordinate.longitude,
-              latitudeDelta: 0.005,
-              longitudeDelta: 0.005,
-            };
-            const { 0: endereco } = await Location.reverseGeocodeAsync({
-              latitude: coord.latitude,
-              longitude: coord.longitude,
-            });
+        <>
+          <Text>Clique no mapa para selecionar o endereço</Text>
+          <MapView
+            onPress={async (e) => {
+              const coord = {
+                latitude: e.nativeEvent.coordinate.latitude,
+                longitude: e.nativeEvent.coordinate.longitude,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+              };
+              const { 0: endereco } = await Location.reverseGeocodeAsync({
+                latitude: coord.latitude,
+                longitude: coord.longitude,
+              });
 
-            setEnderecoMap({
-              logradouro: `${endereco.street}, ${endereco.streetNumber}`,
-              bairro: endereco.district,
-              cep: endereco.postalCode,
-              cidade: endereco.city ?? endereco.subregion,
-              estado: endereco.region,
-              pais: endereco.country,
-            });
-            setMarker(coord);
-          }}
-          style={{ alignSelf: 'stretch', height: '100%' }}
-          region={marker ?? defaultRegion}
-        >
-          {marker && (
-            <Marker coordinate={marker} title="Endreço selecionado!" />
-          )}
-        </MapView>
+              setEnderecoMap({
+                logradouro: `${endereco.street}, ${endereco.streetNumber}`,
+                bairro: endereco.district,
+                cep: endereco.postalCode,
+                cidade: endereco.city ?? endereco.subregion,
+                estado: endereco.region,
+                pais: endereco.country,
+                latitude: coord.latitude,
+                longitude: coord.longitude,
+              });
+              setMarker(coord);
+            }}
+            style={{ alignSelf: 'stretch', height: '100%' }}
+            region={marker ?? defaultRegion}
+          >
+            {marker && (
+              <Marker
+                coordinate={marker}
+                title="Endreço selecionado!"
+                description="Endereço selecionado!"
+              />
+            )}
+          </MapView>
+        </>
       ) : (
         <ActivityIndicator animating={!defaultRegion} size={40} />
       )}
