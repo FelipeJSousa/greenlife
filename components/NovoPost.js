@@ -17,6 +17,8 @@ const NovoPost = () => {
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const { enderecoMap, setEnderecoMap } = useContext(NovoPostContext);
+  const [showModalTag, setShowModalTag] = useState(false);
+  const [tags, setTags] = useState([]);
 
   const mostrarSnack = (message) => {
     setSnackBarMessage(message);
@@ -179,6 +181,23 @@ const NovoPost = () => {
         ) : (
           ''
         )}
+        <Button
+          icon="tag"
+          mode="outlined"
+          style={{ marginVertical: 10 }}
+          onPress={setShowModalTag(true)}
+        >
+          Adicionar Tags
+        </Button>
+
+        <Modal visible={showModalTag}>
+          <View>
+            <Text>Tags</Text>
+            <Button icon="add">adicionar nova tag</Button>
+            <FlatList data={tags} renderItem={(tag) => <Text>{tag}</Text>} />
+          </View>
+        </Modal>
+        {tags?.length > 0 && tags.map((tag) => <Badge>{tag}</Badge>)}
         <Button
           icon="check"
           mode="contained"
