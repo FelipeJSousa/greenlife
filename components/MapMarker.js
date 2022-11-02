@@ -37,7 +37,14 @@ const MapMarker = () => {
     <View style={styles.container}>
       {defaultRegion ? (
         <>
-          <Text>Clique no mapa para selecionar o endereço</Text>
+          <Text
+            style={{
+              margin: 10,
+              fontWeight: 'bold',
+            }}
+          >
+            Clique no mapa para selecionar o endereço
+          </Text>
           <MapView
             onPress={async (e) => {
               const coord = {
@@ -86,7 +93,6 @@ export default MapMarker;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
 });
