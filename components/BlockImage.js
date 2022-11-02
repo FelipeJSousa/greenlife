@@ -1,8 +1,8 @@
 import React from 'react';
 import { Image } from 'react-native';
 
-function BlockImage({ uri = null, height, width, border }) {
-  const value = Math.round(Math.random(1) * 1000);
+const BlockImage = ({ uri = null, height, width, border, random = true }) => {
+  const value = random ? Math.round(Math.random(1) * 1000) : 500;
 
   return (
     <Image
@@ -16,6 +16,6 @@ function BlockImage({ uri = null, height, width, border }) {
       }}
     />
   );
-}
+};
 
 export default BlockImage;

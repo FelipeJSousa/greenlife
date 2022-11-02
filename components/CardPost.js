@@ -1,53 +1,70 @@
 import { Text, ScrollView, View, TouchableNativeFeedback } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Badge from './Badge';
 import BlockImage from './BlockImage';
+import Firebase from '../config/Firebase';
 
 const TextResumo = ({ children }) => {
   const text = `${children.substring(0, 65)}...`;
 
   return <Text style={{ fontSize: 15 }}>{text}</Text>;
 };
-const CardPost = ({ onPress }) => (
-  <TouchableNativeFeedback onPress={onPress}>
-    <View
-      style={{
-        borderStyle: 'solid',
-        borderWidth: 5,
-        borderRadius: 20,
-        borderColor: '#008C8C',
-        padding: 10,
-        flexDirection: 'row',
-        marginBottom: 10,
-      }}
-    >
-      <BlockImage />
-      <View style={{ padding: 5, flex: 1 }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 20 }}>Titulo do post</Text>
-        </View>
-        <ScrollView horizontal>
-          <View
-            onStartShouldSetResponder={() => true}
-            style={{ flexDirection: 'row' }}
-          >
-            <Badge>Tag 1</Badge>
-            <Badge>Tag 2</Badge>
-            <Badge>Tag loooonga 3</Badge>
-            <Badge>Tag 4</Badge>
-            <Badge>Tag 5</Badge>
+const CardPost = ({ onPress, post }) => {
+  const [imagem, setImagem] = useState(null);
+  const { id, nomeLocal, tags, descricao } = post;
+  const obterImagem = () => {
+    const storage = Firebase.storage().ref(`posts/${id}`);
+    storage.getDownloadURL().then((resp) => {
+      setImagem(resp);
+    });
+  };
+  useEffect(() => {
+    obterImagem();
+  }, []);
+  return (
+    <TouchableNativeFeedback onPress={onPress}>
+      <View
+        style={{
+          borderStyle: 'solid',
+          borderWidth: 5,
+          borderRadius: 20,
+          borderColor: '#008C8C',
+          padding: 10,
+          flexDirection: 'row',
+          marginBottom: 10,
+        }}
+      >
+        <BlockImage random={!!imagem} uri={imagem} />
+        <View style={{ padding: 5, flex: 1 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 20 }}>
+              {nomeLocal ?? 'Titulo do post'}
+            </Text>
           </View>
-        </ScrollView>
-        <View style={{ flex: 1 }}>
-          <TextResumo>
-            Resumo do post bla bla bla bla bla bla bla bla bla bla bla bla bla
-            bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla
-            bla
-          </TextResumo>
+          <ScrollView horizontal>
+            <View
+              onStartShouldSetResponder={() => true}
+              style={{ flexDirection: 'row' }}
+            >
+              {tags?.length > 0 &&
+                tags.map((tag, i) => <Badge key={`tag${i}`}>{tag}</Badge>)}
+            </View>
+          </ScrollView>
+          <View style={{ flex: 1 }}>
+            {descricao ? (
+              <TextResumo>{descricao}</TextResumo>
+            ) : (
+              <TextResumo>
+                Resumo do post bla bla bla bla bla bla bla bla bla bla bla bla
+                bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla
+                bla bla bla
+              </TextResumo>
+            )}
+          </View>
         </View>
       </View>
-    </View>
-  </TouchableNativeFeedback>
-);
+    </TouchableNativeFeedback>
+  );
+};
 
 export default CardPost;

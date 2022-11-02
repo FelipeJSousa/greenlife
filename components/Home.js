@@ -1,7 +1,8 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useContext, useEffect } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-paper';
+import Firebase from '../config/Firebase';
 import { AuthContext } from '../providers/AuthContextProvider';
 import CardPost from './CardPost';
 
@@ -13,6 +14,7 @@ const styles = StyleSheet.create({
 const Home = () => {
   const navigation = useNavigation();
   const { Logout } = useContext(AuthContext);
+  const [posts, setPosts] = useState([]);
   const CardPressHandle = () => {
     navigation?.navigate('Post');
   };
@@ -20,7 +22,25 @@ const Home = () => {
   const CriarPostagem = () => {
     navigation.navigate('NovoPost');
   };
-  useEffect(() => {
+
+  const ObterUltimosPosts = () => {
+    const db = Firebase.database().ref('posts');
+    const postsCarregados = [];
+    db.on('value', (snapshot) => {
+      snapshot.forEach((value) => {
+        postsCarregados.push({
+          id: value.key,
+          nomeLocal: value.val().nomeLocal,
+          tags: value.val().tags,
+          descricao: value.val().descricao,
+          dataInclusao: value.val().dataInclusao,
+        });
+      });
+    });
+    setPosts(postsCarregados);
+  };
+
+  const DisposeEvent = () => {
     navigation.removeListener('beforeRemove');
     navigation.addListener('beforeRemove', (e) => {
       e.preventDefault();
@@ -40,6 +60,17 @@ const Home = () => {
         },
       ]);
     });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      ObterUltimosPosts();
+      console.log(posts);
+    }, [])
+  );
+
+  useEffect(() => {
+    DisposeEvent();
   }, []);
 
   return (
@@ -74,14 +105,13 @@ const Home = () => {
         Ultimas postagens
       </Text>
       <ScrollView style={styles.feedList}>
-        <CardPost onPress={CardPressHandle} />
-        <CardPost onPress={CardPressHandle} />
-        <CardPost onPress={CardPressHandle} />
-        <CardPost onPress={CardPressHandle} />
-        <CardPost onPress={CardPressHandle} />
-        <CardPost onPress={CardPressHandle} />
-        <CardPost onPress={CardPressHandle} />
-        <CardPost onPress={CardPressHandle} />
+        {posts?.length > 0 ? (
+          posts.map((post, i) => (
+            <CardPost key={i} onPress={CardPressHandle} post={post} />
+          ))
+        ) : (
+          <Text>Não há nenhum Post.</Text>
+        )}
       </ScrollView>
     </>
   );
