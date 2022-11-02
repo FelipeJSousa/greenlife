@@ -1,9 +1,18 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Dimensions, FlatList, ScrollView, Text, View } from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  ScrollView,
+  Text,
+  View,
+  Modal,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
-import { Button, Modal, Snackbar, TextInput, Title } from 'react-native-paper';
+import { Button, Snackbar, TextInput, Title } from 'react-native-paper';
 import ImageModal from 'react-native-image-modal';
 import Firebase from '../config/Firebase';
 import { NovoPostContext } from '../providers/NovoPostContextProvider';
@@ -19,6 +28,7 @@ const NovoPost = () => {
   const { enderecoMap, setEnderecoMap } = useContext(NovoPostContext);
   const [showModalTag, setShowModalTag] = useState(false);
   const [tags, setTags] = useState([]);
+  const [novaTag, setNovaTag] = useState([]);
 
   const mostrarSnack = (message) => {
     setSnackBarMessage(message);
@@ -64,6 +74,7 @@ const NovoPost = () => {
       descricao,
       endereco: enderecoMap,
       dataInclusao: Date(),
+      tags,
     };
 
     const db = Firebase.database().ref('posts');
@@ -92,8 +103,13 @@ const NovoPost = () => {
     navigation.navigate('MapMarker');
   };
 
+  const addNovaTag = (tag) => {
+    setTags((e) => [...e, tag]);
+    setNovaTag('');
+  };
   return (
     <ScrollView
+      nestedScrollEnabled
       style={{ paddingTop: getStatusBarHeight(), paddingHorizontal: 10 }}
     >
       <View
@@ -185,19 +201,90 @@ const NovoPost = () => {
           icon="tag"
           mode="outlined"
           style={{ marginVertical: 10 }}
-          onPress={setShowModalTag(true)}
+          onPress={() => setShowModalTag(true)}
         >
           Adicionar Tags
         </Button>
+        <Modal
+          visible={showModalTag}
+          animationType="fade"
+          transparent
+          onRequestClose={() => {
+            setShowModalTag(!showModalTag);
+          }}
+        >
+          <View style={styles.modalView}>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setShowModalTag(!showModalTag)}
+            >
+              <Text style={styles.textStyle}>X</Text>
+            </Pressable>
+            <ScrollView horizontal style={{ height: 50, marginHorizontal: 20 }}>
+              {tags?.length > 0 ? (
+                tags.map((tag, i) => (
+                  <Badge key={`novatag${i}`} size={13}>
+                    {tag}
+                  </Badge>
+                ))
+              ) : (
+                <Text>Não há tags.</Text>
+              )}
+            </ScrollView>
 
-        <Modal visible={showModalTag}>
-          <View>
-            <Text>Tags</Text>
-            <Button icon="add">adicionar nova tag</Button>
-            <FlatList data={tags} renderItem={(tag) => <Text>{tag}</Text>} />
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <TextInput
+                mode="outlined"
+                label="Adicionar nova tag"
+                placeholder="Digite o nome da tag"
+                onChangeText={setNovaTag}
+                value={novaTag}
+                onSubmitEditing={() => addNovaTag(novaTag)}
+                style={{ width: 250, height: 60 }}
+              />
+              <Pressable
+                onPress={() =>
+                  novaTag.length > 0 ? addNovaTag(novaTag) : console.log()
+                }
+              >
+                <Text
+                  style={{
+                    color: '#FFF',
+                    fontSize: 40,
+                    paddingHorizontal: 20,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: 60,
+                    marginTop: 8,
+                    borderTopRightRadius: 30,
+                    borderBottomRightRadius: 30,
+                    backgroundColor: '#2196F3',
+                  }}
+                >
+                  +
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Modal>
-        {tags?.length > 0 && tags.map((tag) => <Badge>{tag}</Badge>)}
+        <ScrollView horizontal style={{ height: 50 }}>
+          {tags?.length > 0 ? (
+            tags.map((tag, i) => (
+              <Badge key={`tag${i}`} size={15}>
+                {tag}
+              </Badge>
+            ))
+          ) : (
+            <Text>Não há tags.</Text>
+          )}
+        </ScrollView>
         <Button
           icon="check"
           mode="contained"
@@ -217,5 +304,52 @@ const NovoPost = () => {
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    display: 'flex',
+    height: 'auto',
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    padding: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 100,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingHorizontal: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+});
 
 export default NovoPost;

@@ -46,6 +46,7 @@ module.exports = {
     'no-param-reassign': 'off',
     'no-console': 'off',
     'no-use-before-define': 'off',
+    'react/no-array-index-key': 'off',
     semi: [2, 'always'],
     'react/function-component-definition': [
       2,
