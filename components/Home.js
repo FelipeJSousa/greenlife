@@ -15,8 +15,8 @@ const Home = () => {
   const navigation = useNavigation();
   const { Logout } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
-  const CardPressHandle = () => {
-    navigation?.navigate('Post');
+  const CardPressHandle = (PostId) => {
+    navigation?.navigate('Post', { id: PostId });
   };
 
   const CriarPostagem = () => {
@@ -107,7 +107,11 @@ const Home = () => {
       <ScrollView style={styles.feedList}>
         {posts?.length > 0 ? (
           posts.map((post, i) => (
-            <CardPost key={i} onPress={CardPressHandle} post={post} />
+            <CardPost
+              key={i}
+              onPress={() => CardPressHandle(post.id)}
+              post={post}
+            />
           ))
         ) : (
           <Text>Não há nenhum Post.</Text>

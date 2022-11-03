@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -7,9 +7,33 @@ import {
   TouchableNativeFeedback,
 } from 'react-native';
 import { Entypo, AntDesign } from '@expo/vector-icons';
+import moment from 'moment';
 import BlockImage from './BlockImage';
+import Firebase from '../config/Firebase';
 
-const Post = () => {
+const Post = ({ route }) => {
+  const { id } = route.params;
+  const [post, setPost] = useState(null);
+
+  const ObterPost = () => {
+    const db = Firebase.database().ref(`posts/${id}`);
+    const postsCarregados = [];
+    db.on('value', (snapshot) => {
+      setPost({
+        id: snapshot.key,
+        nomeLocal: snapshot.val().nomeLocal,
+        tags: snapshot.val().tags,
+        descricao: snapshot.val().descricao,
+        dataInclusao: snapshot.val().dataInclusao,
+        endereco: snapshot.val().endereco,
+      });
+    });
+  };
+
+  useEffect(() => {
+    ObterPost();
+  }, []);
+
   const randomValue = () => Math.round(Math.random(1) * 1000);
   const initLike = randomValue();
   const initComents = randomValue();
@@ -26,7 +50,7 @@ const Post = () => {
         />
         <View style={{ flex: 1, paddingHorizontal: 20 }}>
           <Text style={{ fontSize: 50, paddingHorizontal: 5 }}>
-            Titulo do Post
+            {post?.nomeLocal ?? 'Titulo do Post'}
           </Text>
           <View
             style={{
@@ -37,16 +61,19 @@ const Post = () => {
             }}
           >
             <Text style={{ fontSize: 15 }}>Autor do post</Text>
-            <Text style={{ fontSize: 15 }}>20/09/01 às 19:50</Text>
+            <Text style={{ fontSize: 15 }}>
+              {moment(post?.dataInclusao).fromNow() ?? '20/09/01 às 19:50'}
+            </Text>
           </View>
           <Text style={{ fontSize: 20 }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
+            {post?.descricao ??
+              `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
             at nibh tincidunt, pretium dui ut, laoreet lacus. Nunc faucibus arcu
             quis rutrum condimentum. Nam mollis lectus enim, a congue neque
             tristique at. Maecenas quam libero, scelerisque vitae porta non,
             congue semper erat. Pellentesque maximus lectus risus, eget ornare
             arcu ullamcorper vel. Fusce aliquet egestas justo sit amet
-            efficitur. Donec ultricies cursus odio, id commodo dolor
+            efficitur. Donec ultricies cursus odio, id commodo dolor`}
           </Text>
           <View style={{ flex: 1, paddingVertical: 10, flexDirection: 'row' }}>
             <View
@@ -64,8 +91,9 @@ const Post = () => {
               }}
             >
               <Text style={{ fontSize: 20, textAlign: 'center' }}>
-                R. José Bongiovani 259 - Pres. Prudente - SP - 19050-050 -
-                Brasil
+                {post?.endereco?.logradouro ??
+                  `R. José Bongiovani 259 - Pres. Prudente - SP - 19050-050 -
+                Brasil`}
               </Text>
             </View>
           </View>
