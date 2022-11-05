@@ -17,6 +17,7 @@ import Firebase from '../config/Firebase';
 import { NovoPostContext } from '../providers/NovoPostContextProvider';
 import Badge from './Badge';
 import { AuthContext } from '../providers/AuthContextProvider';
+import Tags from './Tags';
 
 const NovoPost = () => {
   const navigation = useNavigation();
@@ -80,6 +81,7 @@ const NovoPost = () => {
       dataInclusao: Date(),
       tags,
       usuario: user.nomeCompleto,
+      likes: [],
     };
 
     const db = Firebase.database().ref('posts');
@@ -236,11 +238,7 @@ const NovoPost = () => {
             </Pressable>
             <ScrollView horizontal style={{ height: 50, marginHorizontal: 20 }}>
               {tags?.length > 0 ? (
-                tags.map((tag, i) => (
-                  <Badge key={`novatag${i}`} size={13}>
-                    {tag}
-                  </Badge>
-                ))
+                <Tags tags={tags} />
               ) : (
                 <Text>Não há tags.</Text>
               )}
@@ -289,15 +287,7 @@ const NovoPost = () => {
           </View>
         </Modal>
         <ScrollView horizontal style={{ height: 50 }}>
-          {tags?.length > 0 ? (
-            tags.map((tag, i) => (
-              <Badge key={`tag${i}`} size={15}>
-                {tag}
-              </Badge>
-            ))
-          ) : (
-            <Text>Não há tags.</Text>
-          )}
+          {tags?.length > 0 ? <Tags tags={tags} /> : <Text>Não há tags.</Text>}
         </ScrollView>
         <Button
           icon="check"

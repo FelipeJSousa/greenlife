@@ -11,6 +11,7 @@ import moment from 'moment';
 import { ActivityIndicator } from 'react-native-paper';
 import BlockImage from './BlockImage';
 import Firebase from '../config/Firebase';
+import Tags from './Tags';
 
 const Post = ({ route }) => {
   const [imagem, setImagem] = useState(null);
@@ -66,6 +67,9 @@ const Post = ({ route }) => {
           <Text style={{ fontSize: 50, paddingHorizontal: 5 }}>
             {post?.nomeLocal ?? 'Titulo do Post'}
           </Text>
+          <ScrollView horizontal>
+            <Tags tags={post?.tags} />
+          </ScrollView>
           <View
             style={{
               flex: 1,

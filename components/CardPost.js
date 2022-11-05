@@ -1,8 +1,8 @@
 import { Text, ScrollView, View, TouchableNativeFeedback } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import Badge from './Badge';
 import BlockImage from './BlockImage';
 import Firebase from '../config/Firebase';
+import Tags from './Tags';
 
 const TextResumo = ({ children }) => {
   const text = `${children.substring(0, 65)}...`;
@@ -45,13 +45,7 @@ const CardPost = ({ onPress, post }) => {
             </Text>
           </View>
           <ScrollView horizontal>
-            <View
-              onStartShouldSetResponder={() => true}
-              style={{ flexDirection: 'row' }}
-            >
-              {tags?.length > 0 &&
-                tags.map((tag, i) => <Badge key={`tag${i}`}>{tag}</Badge>)}
-            </View>
+            <Tags tags={tags} />
           </ScrollView>
           <View style={{ flex: 1 }}>
             {descricao ? (
