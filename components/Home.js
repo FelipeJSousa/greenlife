@@ -112,6 +112,7 @@ const Home = () => {
       </Text>
       {posts?.length > 0 ? (
         <FlatList
+          style={{ paddingHorizontal: 10 }}
           data={posts}
           renderItem={({ item, i }) => (
             <CardPost
