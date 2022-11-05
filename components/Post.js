@@ -83,16 +83,7 @@ const Post = ({ route }) => {
               {moment(post?.dataInclusao).fromNow() ?? '20/09/01 às 19:50'}
             </Text>
           </View>
-          <Text style={{ fontSize: 20 }}>
-            {post?.descricao ??
-              `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
-            at nibh tincidunt, pretium dui ut, laoreet lacus. Nunc faucibus arcu
-            quis rutrum condimentum. Nam mollis lectus enim, a congue neque
-            tristique at. Maecenas quam libero, scelerisque vitae porta non,
-            congue semper erat. Pellentesque maximus lectus risus, eget ornare
-            arcu ullamcorper vel. Fusce aliquet egestas justo sit amet
-            efficitur. Donec ultricies cursus odio, id commodo dolor`}
-          </Text>
+          <Text style={{ fontSize: 20 }}>{post?.descricao}</Text>
           <View style={{ flex: 1, paddingVertical: 10, flexDirection: 'row' }}>
             <View
               style={{
@@ -109,9 +100,7 @@ const Post = ({ route }) => {
               }}
             >
               <Text style={{ fontSize: 20, textAlign: 'center' }}>
-                {post?.endereco?.logradouro ??
-                  `R. José Bongiovani 259 - Pres. Prudente - SP - 19050-050 -
-                Brasil`}
+                {post?.endereco?.logradouro}
               </Text>
             </View>
           </View>

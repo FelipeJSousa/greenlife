@@ -119,19 +119,11 @@ const NovoPost = () => {
     !['latitude', 'longitude', 'latitudeDelta', 'longitudeDelta'].includes(key);
 
   return (
-    <ScrollView
-      nestedScrollEnabled
-      style={{ paddingTop: getStatusBarHeight(), paddingHorizontal: 10 }}
-    >
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          paddingVertical: 50,
-        }}
-      >
+    <ScrollView style={{ paddingVertical: 30, paddingHorizontal: 10 }}>
+      <View>
         <Title
           style={{
+            padding: 20,
             fontSize: 25,
             lineHeight: 25,
             textAlign: 'center',
