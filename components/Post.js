@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   ScrollView,
   View,
@@ -8,15 +8,17 @@ import {
 } from 'react-native';
 import { Entypo, AntDesign } from '@expo/vector-icons';
 import moment from 'moment';
-import { ActivityIndicator } from 'react-native-paper';
 import BlockImage from './BlockImage';
 import Firebase from '../config/Firebase';
 import Tags from './Tags';
+import { AuthContext } from '../providers/AuthContextProvider';
 
 const Post = ({ route }) => {
   const [imagem, setImagem] = useState(null);
   const { id } = route.params;
   const [post, setPost] = useState(null);
+  const [liked, setLiked] = useState(false);
+  const { user } = useContext(AuthContext);
 
   const obterImagem = () => {
     const storage = Firebase.storage().ref(`posts/${id}`);
@@ -31,6 +33,10 @@ const Post = ({ route }) => {
   const ObterPost = () => {
     const db = Firebase.database().ref(`posts/${id}`);
     db.on('value', (snapshot) => {
+      let likes = [];
+      if (snapshot.val()?.likes)
+        likes = Object.entries(snapshot.val()?.likes).map((e) => e);
+
       setPost({
         id: snapshot.key,
         nomeLocal: snapshot.val().nomeLocal,
@@ -39,7 +45,11 @@ const Post = ({ route }) => {
         dataInclusao: snapshot.val().dataInclusao,
         endereco: snapshot.val().endereco,
         usuario: snapshot.val().usuario,
+        likes,
       });
+
+      setQtdeLikes(likes?.length ?? 0);
+      setLiked(JaDeuLike(likes));
     });
   };
 
@@ -49,11 +59,31 @@ const Post = ({ route }) => {
   }, []);
 
   const randomValue = () => Math.round(Math.random(1) * 1000);
-  const initLike = randomValue();
   const initComents = randomValue();
   const [coments, setComents] = useState(initComents);
-  const [like, setLike] = useState(initLike);
-  const handleLike = () => setLike(like + 1);
+  const [qtdeLikes, setQtdeLikes] = useState(0);
+
+  const getLikeId = (value = null) =>
+    value
+      ? value?.filter((x) => x[1] === user.uid)
+      : post?.likes?.filter((x) => x[1] === user.uid);
+
+  const JaDeuLike = (value = null) => getLikeId(value)?.length > 0;
+
+  const handleLike = () => {
+    setLiked(!liked);
+    if (!liked) {
+      const db = Firebase.database().ref(`posts/${post.id}/likes`);
+      db.push(user.uid);
+      setQtdeLikes(qtdeLikes + 1);
+      return;
+    }
+    const likeId = getLikeId()[0][0];
+    const db = Firebase.database().ref(`posts/${post.id}/likes/${likeId}`);
+    db.remove();
+    setQtdeLikes(qtdeLikes - 1);
+  };
+
   return (
     <ScrollView>
       <View style={{ flex: 1 }}>
@@ -118,9 +148,19 @@ const Post = ({ route }) => {
             {coments} Comentários
           </Text>
           <TouchableNativeFeedback onPress={handleLike}>
-            <View style={{ flexDirection: 'column', paddingHorizontal: 20 }}>
-              <AntDesign name="like1" size={50} color="#008C8C" />
-              <Text style={{ fontSize: 30 }}>{like}</Text>
+            <View
+              style={{
+                flexDirection: 'column',
+                paddingHorizontal: 20,
+                alignItems: 'center',
+              }}
+            >
+              <AntDesign
+                name="like1"
+                size={50}
+                color={liked ? '#008C8C' : 'black'}
+              />
+              <Text style={{ fontSize: 30 }}>{qtdeLikes}</Text>
             </View>
           </TouchableNativeFeedback>
         </View>

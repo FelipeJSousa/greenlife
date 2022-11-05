@@ -116,11 +116,12 @@ const Home = () => {
           data={posts}
           renderItem={({ item, i }) => (
             <CardPost
-              key={i}
+              key={`cardpost${i}`}
               onPress={() => CardPressHandle(item.id)}
               post={item}
             />
           )}
+          keyExtractor={(item, index) => String(index) + item.id}
         />
       ) : (
         <Loading animate={posts == null} />
