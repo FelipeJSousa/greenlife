@@ -34,6 +34,7 @@ const Post = ({ route }) => {
         descricao: snapshot.val().descricao,
         dataInclusao: snapshot.val().dataInclusao,
         endereco: snapshot.val().endereco,
+        usuario: snapshot.val().usuario,
       });
     });
   };
@@ -76,7 +77,7 @@ const Post = ({ route }) => {
               paddingHorizontal: 5,
             }}
           >
-            <Text style={{ fontSize: 15 }}>Autor do post</Text>
+            <Text style={{ fontSize: 15 }}>Autor: {post?.usuario ?? '-'}</Text>
             <Text style={{ fontSize: 15 }}>
               {moment(post?.dataInclusao).fromNow() ?? '20/09/01 às 19:50'}
             </Text>

@@ -36,6 +36,7 @@ const Login = ({ navigation }) => {
         }, 1000);
       })
       .catch((e) => {
+        setLoading(false);
         mostrarSnack('Usuario ou senha inválidos!');
       });
   };
