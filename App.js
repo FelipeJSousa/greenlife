@@ -3,6 +3,8 @@ import {
   createStackNavigator,
   TransitionPresets,
 } from '@react-navigation/stack';
+import moment from 'moment';
+import 'moment/min/locales';
 import React from 'react';
 import { Platform } from 'react-native';
 import CadastrarUsuario from './components/CadastrarUsuario';
@@ -16,6 +18,8 @@ import { NovoPostContextProvider } from './providers/NovoPostContextProvider';
 
 const Stack = createStackNavigator();
 const isAndroid = Platform.OS === 'android';
+
+moment.locale('pt-BR');
 
 const StackNav = () => (
   <Stack.Navigator>

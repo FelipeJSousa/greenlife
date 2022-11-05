@@ -8,16 +8,24 @@ import {
 } from 'react-native';
 import { Entypo, AntDesign } from '@expo/vector-icons';
 import moment from 'moment';
+import { ActivityIndicator } from 'react-native-paper';
 import BlockImage from './BlockImage';
 import Firebase from '../config/Firebase';
 
 const Post = ({ route }) => {
+  const [imagem, setImagem] = useState(null);
   const { id } = route.params;
   const [post, setPost] = useState(null);
 
+  const obterImagem = () => {
+    const storage = Firebase.storage().ref(`posts/${id}`);
+    storage.getDownloadURL().then((resp) => {
+      setImagem(resp);
+    });
+  };
+
   const ObterPost = () => {
     const db = Firebase.database().ref(`posts/${id}`);
-    const postsCarregados = [];
     db.on('value', (snapshot) => {
       setPost({
         id: snapshot.key,
@@ -26,12 +34,14 @@ const Post = ({ route }) => {
         descricao: snapshot.val().descricao,
         dataInclusao: snapshot.val().dataInclusao,
         endereco: snapshot.val().endereco,
+        usuario: snapshot.val().usuario,
       });
     });
   };
 
   useEffect(() => {
     ObterPost();
+    obterImagem();
   }, []);
 
   const randomValue = () => Math.round(Math.random(1) * 1000);
@@ -43,11 +53,18 @@ const Post = ({ route }) => {
   return (
     <ScrollView>
       <View style={{ flex: 1 }}>
-        <BlockImage
-          width={Dimensions.get('window').width}
-          height={250}
-          border={0}
-        />
+        {imagem ? (
+          <BlockImage
+            width={Dimensions.get('window').width}
+            height={250}
+            border={0}
+            uri={imagem}
+          />
+        ) : (
+          <View style={{ height: 250, flex: 1, justifyContent: 'center' }}>
+            <ActivityIndicator animating={imagem == null} color="#008C8C" />
+          </View>
+        )}
         <View style={{ flex: 1, paddingHorizontal: 20 }}>
           <Text style={{ fontSize: 50, paddingHorizontal: 5 }}>
             {post?.nomeLocal ?? 'Titulo do Post'}
@@ -60,7 +77,7 @@ const Post = ({ route }) => {
               paddingHorizontal: 5,
             }}
           >
-            <Text style={{ fontSize: 15 }}>Autor do post</Text>
+            <Text style={{ fontSize: 15 }}>Autor: {post?.usuario ?? '-'}</Text>
             <Text style={{ fontSize: 15 }}>
               {moment(post?.dataInclusao).fromNow() ?? '20/09/01 às 19:50'}
             </Text>

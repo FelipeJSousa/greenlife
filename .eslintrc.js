@@ -47,6 +47,7 @@ module.exports = {
     'no-console': 'off',
     'no-use-before-define': 'off',
     'react/no-array-index-key': 'off',
+    'no-nested-ternary': 'off',
     semi: [2, 'always'],
     'react/function-component-definition': [
       2,

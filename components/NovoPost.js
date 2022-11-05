@@ -17,6 +17,7 @@ import ImageModal from 'react-native-image-modal';
 import Firebase from '../config/Firebase';
 import { NovoPostContext } from '../providers/NovoPostContextProvider';
 import Badge from './Badge';
+import { AuthContext } from '../providers/AuthContextProvider';
 
 const NovoPost = () => {
   const navigation = useNavigation();
@@ -26,6 +27,7 @@ const NovoPost = () => {
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const { enderecoMap, setEnderecoMap } = useContext(NovoPostContext);
+  const { user } = useContext(AuthContext);
   const [showModalTag, setShowModalTag] = useState(false);
   const [tags, setTags] = useState([]);
   const [novaTag, setNovaTag] = useState([]);
@@ -75,6 +77,7 @@ const NovoPost = () => {
       endereco: enderecoMap,
       dataInclusao: Date(),
       tags,
+      usuario: user.nomeCompleto,
     };
 
     const db = Firebase.database().ref('posts');
