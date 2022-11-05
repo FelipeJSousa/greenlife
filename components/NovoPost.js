@@ -1,8 +1,7 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Dimensions,
-  FlatList,
   ScrollView,
   Text,
   View,
@@ -63,7 +62,10 @@ const NovoPost = () => {
 
   const DadosEhValido = () => {
     const result =
-      nomeLocal !== '' && descricao !== '' && imagens !== '' && !!enderecoMap;
+      nomeLocal !== '' &&
+      descricao !== '' &&
+      imagens?.length > 0 &&
+      !!enderecoMap;
 
     if (result === false) mostrarSnack('Preencha todos os dados!');
     return result;
@@ -110,6 +112,10 @@ const NovoPost = () => {
     setTags((e) => [...e, tag]);
     setNovaTag('');
   };
+
+  const renderAddressProp = (key) =>
+    !['latitude', 'longitude', 'latitudeDelta', 'longitudeDelta'].includes(key);
+
   return (
     <ScrollView
       nestedScrollEnabled
@@ -163,14 +169,19 @@ const NovoPost = () => {
         {enderecoMap && (
           <View>
             {enderecoMap &&
-              Object.entries(enderecoMap).map(([key, value]) => (
-                <Text>
-                  <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-                    {key}:
-                  </Text>{' '}
-                  {value}
-                </Text>
-              ))}
+              Object.entries(enderecoMap).map(([key, value]) => {
+                if (renderAddressProp(key))
+                  return (
+                    <Text>
+                      <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+                        {key}:
+                      </Text>{' '}
+                      {value}
+                    </Text>
+                  );
+
+                return <></>;
+              })}
           </View>
         )}
         <Button
