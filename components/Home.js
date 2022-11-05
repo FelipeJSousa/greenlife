@@ -77,7 +77,6 @@ const Home = () => {
 
   useEffect(() => {
     DisposeEvent();
-    // ObterUltimosPosts();
   }, []);
 
   return (

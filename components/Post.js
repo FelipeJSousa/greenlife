@@ -19,9 +19,12 @@ const Post = ({ route }) => {
 
   const obterImagem = () => {
     const storage = Firebase.storage().ref(`posts/${id}`);
-    storage.getDownloadURL().then((resp) => {
-      setImagem(resp);
-    });
+    storage
+      ?.getDownloadURL()
+      ?.then((resp) => {
+        setImagem(resp);
+      })
+      ?.catch((e) => {});
   };
 
   const ObterPost = () => {
@@ -47,24 +50,18 @@ const Post = ({ route }) => {
   const randomValue = () => Math.round(Math.random(1) * 1000);
   const initLike = randomValue();
   const initComents = randomValue();
-  const [coment, setComent] = useState(initComents);
+  const [coments, setComents] = useState(initComents);
   const [like, setLike] = useState(initLike);
   const handleLike = () => setLike(like + 1);
   return (
     <ScrollView>
       <View style={{ flex: 1 }}>
-        {imagem ? (
-          <BlockImage
-            width={Dimensions.get('window').width}
-            height={250}
-            border={0}
-            uri={imagem}
-          />
-        ) : (
-          <View style={{ height: 250, flex: 1, justifyContent: 'center' }}>
-            <ActivityIndicator animating={imagem == null} color="#008C8C" />
-          </View>
-        )}
+        <BlockImage
+          width={Dimensions.get('window').width}
+          height={250}
+          border={0}
+          uri={imagem}
+        />
         <View style={{ flex: 1, paddingHorizontal: 20 }}>
           <Text style={{ fontSize: 50, paddingHorizontal: 5 }}>
             {post?.nomeLocal ?? 'Titulo do Post'}
@@ -99,7 +96,7 @@ const Post = ({ route }) => {
                 flexDirection: 'column',
               }}
             >
-              <Entypo name="location-pin" size={50} color="black" />
+              <Entypo name="location-pin" size={50} color="#008C8C" />
             </View>
             <View
               style={{
@@ -125,11 +122,11 @@ const Post = ({ route }) => {
           }}
         >
           <Text style={{ fontSize: 30, paddingHorizontal: 5 }}>
-            {coment} Comentários
+            {coments} Comentários
           </Text>
           <TouchableNativeFeedback onPress={handleLike}>
             <View style={{ flexDirection: 'column', paddingHorizontal: 20 }}>
-              <AntDesign name="like1" size={50} color="black" />
+              <AntDesign name="like1" size={50} color="#008C8C" />
               <Text style={{ fontSize: 30 }}>{like}</Text>
             </View>
           </TouchableNativeFeedback>

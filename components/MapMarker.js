@@ -82,8 +82,8 @@ const MapMarker = () => {
                 Height: 10,
               }}
             >
-              {pinned
-                ? `${enderecoMap.logradouro}, ${enderecoMap.bairro} - ${enderecoMap.cidade} - ${enderecoMap.estado} - ${enderecoMap.pais} - ${enderecoMap.cep}`
+              {pinned && enderecoMap
+                ? `${enderecoMap?.logradouro}, ${enderecoMap?.bairro} - ${enderecoMap?.cidade} - ${enderecoMap?.estado} - ${enderecoMap?.pais} - ${enderecoMap?.cep}`
                 : '\n '}
             </Text>
           </View>
@@ -125,7 +125,11 @@ const MapMarker = () => {
           {pinned ? Marker() : Unmaker()}
         </>
       ) : (
-        <ActivityIndicator animating={!currentRegion} size={40} />
+        <ActivityIndicator
+          animating={!currentRegion}
+          size={40}
+          color="#008C8C"
+        />
       )}
     </View>
   );
