@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { Entypo, AntDesign } from '@expo/vector-icons';
 import moment from 'moment';
+import { Button, TextInput } from 'react-native-paper';
+import { FlatList } from 'react-native-gesture-handler';
 import BlockImage from './BlockImage';
 import Firebase from '../config/Firebase';
 import Tags from './Tags';
@@ -19,6 +21,9 @@ const Post = ({ route }) => {
   const [post, setPost] = useState(null);
   const [liked, setLiked] = useState(false);
   const { user } = useContext(AuthContext);
+  const [coment, setComent] = useState('');
+  const [qtdeComents, setQtdeComents] = useState(0);
+  const [qtdeLikes, setQtdeLikes] = useState(0);
 
   const obterImagem = () => {
     const storage = Firebase.storage().ref(`posts/${id}`);
@@ -37,6 +42,10 @@ const Post = ({ route }) => {
       if (snapshot.val()?.likes)
         likes = Object.entries(snapshot.val()?.likes).map((e) => e);
 
+      let coments = [];
+      if (snapshot.val()?.coments)
+        coments = Object.entries(snapshot.val()?.coments).map((e) => e[1]);
+
       setPost({
         id: snapshot.key,
         nomeLocal: snapshot.val().nomeLocal,
@@ -46,9 +55,11 @@ const Post = ({ route }) => {
         endereco: snapshot.val().endereco,
         usuario: snapshot.val().usuario,
         likes,
+        coments,
       });
 
       setQtdeLikes(likes?.length ?? 0);
+      setQtdeComents(coments?.length ?? 0);
       setLiked(JaDeuLike(likes));
     });
   };
@@ -57,11 +68,6 @@ const Post = ({ route }) => {
     ObterPost();
     obterImagem();
   }, []);
-
-  const randomValue = () => Math.round(Math.random(1) * 1000);
-  const initComents = randomValue();
-  const [coments, setComents] = useState(initComents);
-  const [qtdeLikes, setQtdeLikes] = useState(0);
 
   const getLikeId = (value = null) =>
     value
@@ -84,88 +90,163 @@ const Post = ({ route }) => {
     setQtdeLikes(qtdeLikes - 1);
   };
 
+  const novoComentario = () => {
+    if (coment) {
+      const db = Firebase.database().ref(`posts/${post.id}/coments`);
+      db.push({
+        user: user.uid,
+        userNome: user.nomeCompleto,
+        comentario: coment,
+        dataInclusao: Date(),
+      });
+      setQtdeComents(qtdeComents + 1);
+      setComent('');
+    }
+  };
+
   return (
-    <ScrollView>
-      <View style={{ flex: 1 }}>
-        <BlockImage
-          width={Dimensions.get('window').width}
-          height={250}
-          border={0}
-          uri={imagem}
-        />
-        <View style={{ flex: 1, paddingHorizontal: 20 }}>
-          <Text style={{ fontSize: 50, paddingHorizontal: 5 }}>
-            {post?.nomeLocal ?? 'Titulo do Post'}
-          </Text>
-          <ScrollView horizontal>
-            <Tags tags={post?.tags} />
-          </ScrollView>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingHorizontal: 5,
-            }}
-          >
-            <Text style={{ fontSize: 15 }}>Autor: {post?.usuario ?? '-'}</Text>
-            <Text style={{ fontSize: 15 }}>
-              {moment(post?.dataInclusao).fromNow() ?? '20/09/01 às 19:50'}
+    <>
+      <ScrollView>
+        <View style={{ flex: 1 }}>
+          <BlockImage
+            width={Dimensions.get('window').width}
+            height={250}
+            border={0}
+            uri={imagem}
+          />
+          <View style={{ flex: 1, paddingHorizontal: 20 }}>
+            <Text style={{ fontSize: 50, paddingHorizontal: 5 }}>
+              {post?.nomeLocal ?? 'Titulo do Post'}
             </Text>
-          </View>
-          <Text style={{ fontSize: 20 }}>{post?.descricao}</Text>
-          <View style={{ flex: 1, paddingVertical: 10, flexDirection: 'row' }}>
+            <ScrollView horizontal>
+              <Tags tags={post?.tags} />
+            </ScrollView>
             <View
               style={{
                 flex: 1,
-                flexDirection: 'column',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                paddingHorizontal: 5,
               }}
             >
-              <Entypo name="location-pin" size={50} color="#008C8C" />
-            </View>
-            <View
-              style={{
-                flex: 5,
-                flexDirection: 'column',
-              }}
-            >
-              <Text style={{ fontSize: 20, textAlign: 'center' }}>
-                {post?.endereco?.logradouro}
+              <Text style={{ fontSize: 15 }}>
+                Autor: {post?.usuario ?? '-'}
+              </Text>
+              <Text style={{ fontSize: 15 }}>
+                {moment(post?.dataInclusao).fromNow() ?? '20/09/01 às 19:50'}
               </Text>
             </View>
+            <Text style={{ fontSize: 20 }}>{post?.descricao}</Text>
+            <View
+              style={{ flex: 1, paddingVertical: 10, flexDirection: 'row' }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'column',
+                }}
+              >
+                <Entypo name="location-pin" size={50} color="#008C8C" />
+              </View>
+              <View
+                style={{
+                  flex: 5,
+                  flexDirection: 'column',
+                }}
+              >
+                <Text style={{ fontSize: 20, textAlign: 'center' }}>
+                  {post?.endereco?.logradouro}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              paddingHorizontal: 20,
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ fontSize: 30, paddingHorizontal: 5 }}>
+              {qtdeComents} Comentários
+            </Text>
+            <TouchableNativeFeedback onPress={handleLike}>
+              <View
+                style={{
+                  flexDirection: 'column',
+                  paddingHorizontal: 20,
+                  alignItems: 'center',
+                }}
+              >
+                <AntDesign
+                  name="like1"
+                  size={50}
+                  color={liked ? '#008C8C' : 'black'}
+                />
+                <Text style={{ fontSize: 30 }}>{qtdeLikes}</Text>
+              </View>
+            </TouchableNativeFeedback>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              paddingHorizontal: 20,
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+            }}
+          >
+            {post?.coments?.length > 0 && (
+              <FlatList
+                style={{ paddingHorizontal: 10 }}
+                data={post.coments}
+                renderItem={({ item, i }) => (
+                  <Text>
+                    {item.dataInclusao} - {item.userNome} - {item.comentario}
+                  </Text>
+                )}
+                keyExtractor={(item, index) => String(index) + item.id}
+              />
+            )}
           </View>
         </View>
-        <View
-          style={{
-            flex: 1,
-            paddingHorizontal: 20,
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ fontSize: 30, paddingHorizontal: 5 }}>
-            {coments} Comentários
-          </Text>
-          <TouchableNativeFeedback onPress={handleLike}>
-            <View
-              style={{
-                flexDirection: 'column',
-                paddingHorizontal: 20,
-                alignItems: 'center',
-              }}
-            >
-              <AntDesign
-                name="like1"
-                size={50}
-                color={liked ? '#008C8C' : 'black'}
-              />
-              <Text style={{ fontSize: 30 }}>{qtdeLikes}</Text>
-            </View>
-          </TouchableNativeFeedback>
-        </View>
+      </ScrollView>
+      <View
+        style={{
+          padding: 10,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <TextInput
+          style={{ width: '75%' }}
+          mode="outlined"
+          label="Comentário"
+          placeholder="Digite seu comentário"
+          onChangeText={setComent}
+          value={coment}
+        />
+        <TouchableNativeFeedback onPress={novoComentario}>
+          <Entypo
+            style={{
+              borderRadius: 20,
+              borderColor: '#008C8C',
+              borderStyle: 'solid',
+              borderWidth: 1,
+              margin: 10,
+              alignItems: 'center',
+              textAlign: 'center',
+            }}
+            size={40}
+            color="#008C8C"
+            name="arrow-right"
+          />
+        </TouchableNativeFeedback>
       </View>
-    </ScrollView>
+    </>
   );
 };
 
