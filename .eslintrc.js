@@ -18,6 +18,13 @@ module.exports = {
   },
   plugins: ['react', 'prettier'],
   rules: {
+    'prefer-const': [
+      'error',
+      {
+        destructuring: 'any',
+        ignoreReadBeforeAssign: true,
+      },
+    ],
     'prettier/prettier': [
       'error',
       {
@@ -38,6 +45,18 @@ module.exports = {
     'react/prop-types': 'off',
     'no-param-reassign': 'off',
     'no-console': 'off',
+    'no-use-before-define': 'off',
+    'react/no-array-index-key': 'off',
+    'no-nested-ternary': 'off',
+    'react/jsx-no-useless-fragment': 'off',
     semi: [2, 'always'],
+    'react/function-component-definition': [
+      2,
+      {
+        namedComponents: 'arrow-function',
+        unnamedComponents: 'arrow-function',
+      },
+    ],
+    'react/no-unstable-nested-components': ['off', { allowAsProps: true }],
   },
 };

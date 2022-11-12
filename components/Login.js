@@ -1,31 +1,64 @@
-import { Card, Button, TextInput, Title, Snackbar } from 'react-native-paper';
-import React, { useState } from 'react';
-import { SafeAreaView, View, Dimensions } from 'react-native';
+import { Button, TextInput, Title, Snackbar } from 'react-native-paper';
+import React, { useContext, useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import Firebase from '../config/Firebase';
 
-function Login({ navigation }) {
-  const [visivel, setVisivel] = useState(false);
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+const Login = ({ navigation }) => {
+  const [email, setEmail] = useState('felipe@mail.com');
+  const [senha, setSenha] = useState('12345678');
+  const [showSnackBar, setShowSnackBar] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
+  const [showLoading, setLoading] = useState(false);
 
-  const mostrarSnack = () => {
-    setVisivel(true);
+  const mostrarSnack = (message) => {
+    setSnackBarMessage(message);
+    setShowSnackBar(true);
+  };
+  const ocultarSnack = () => setShowSnackBar(false);
+
+  const DadosEhValido = () => {
+    const result = email !== '' && senha !== '';
+
+    if (result === false)
+      mostrarSnack('Nome de usuário e/ou senha incorretos!');
+
+    return result;
   };
 
-  const fecharSnack = () => {
-    setVisivel(false);
+  const RealizarLogin = () => {
+    Firebase.auth()
+      .signInWithEmailAndPassword(email, senha)
+      .then(() => {
+        setTimeout(() => {
+          setLoading(false);
+          navigation.navigate('MenuLateral');
+        }, 1000);
+      })
+      .catch((e) => {
+        setLoading(false);
+        mostrarSnack('Usuario ou senha inválidos!');
+      });
   };
 
   const acessar = () => {
-    if (email && senha) {
-      navigation.navigate('MenuLateral');
-    } else {
-      mostrarSnack();
-    }
+    setLoading(true);
+    if (DadosEhValido() === false) return;
+    RealizarLogin();
+  };
+
+  const CadastrarUsuario = () => {
+    navigation.navigate('CadastrarUsuario');
   };
 
   return (
-    <View style={{ flex: 1, paddingTop: getStatusBarHeight() }}>
+    <View
+      style={{
+        flex: 1,
+        paddingTop: getStatusBarHeight(),
+        paddingHorizontal: 10,
+      }}
+    >
       <View style={{ flex: 1, justifyContent: 'center' }}>
         <Title
           style={{
@@ -43,12 +76,14 @@ function Login({ navigation }) {
           label="Email"
           placeholder="Digite seu emmail"
           onChangeText={setEmail}
+          value={email}
         />
         <TextInput
           mode="outlined"
           label="senha"
           placeholder="Digite sua senha"
           onChangeText={setSenha}
+          value={senha}
         />
       </View>
       <View
@@ -63,13 +98,14 @@ function Login({ navigation }) {
           mode="contained"
           onPress={acessar}
           contentStyle={{ flexDirection: 'row-reverse' }}
+          loading={showLoading}
         >
           Acessar
         </Button>
         <Button
           icon="arrow-right"
           mode="contained"
-          onPress={acessar}
+          onPress={CadastrarUsuario}
           contentStyle={{ flexDirection: 'row-reverse' }}
           color="green"
         >
@@ -77,14 +113,14 @@ function Login({ navigation }) {
         </Button>
       </View>
       <Snackbar
-        visible={visivel}
-        onDismiss={fecharSnack}
+        visible={showSnackBar}
+        onDismiss={ocultarSnack}
         action={{ label: 'Fechar' }}
       >
-        Nome de usuário e/ou senha incorretos!
+        {snackBarMessage}
       </Snackbar>
     </View>
   );
-}
+};
 
 export default Login;

@@ -1,14 +1,29 @@
 import { Text, ScrollView, View, TouchableNativeFeedback } from 'react-native';
-import React from 'react';
-import Badge from './Badge';
+import React, { useEffect, useState } from 'react';
 import BlockImage from './BlockImage';
+import Firebase from '../config/Firebase';
+import Tags from './Tags';
 
-function TextResumo({ children }) {
+const TextResumo = ({ children }) => {
   const text = `${children.substring(0, 65)}...`;
 
   return <Text style={{ fontSize: 15 }}>{text}</Text>;
-}
-function CardPost({ onPress }) {
+};
+const CardPost = ({ onPress, post }) => {
+  const [imagem, setImagem] = useState(null);
+  const { id, nomeLocal, tags, descricao } = post;
+  const obterImagem = () => {
+    const storage = Firebase.storage().ref(`posts/${id}`);
+    storage
+      ?.getDownloadURL()
+      ?.then((resp) => {
+        if (resp) setImagem(resp);
+      })
+      ?.catch((e) => {});
+  };
+  useEffect(() => {
+    obterImagem();
+  }, []);
   return (
     <TouchableNativeFeedback onPress={onPress}>
       <View
@@ -22,34 +37,31 @@ function CardPost({ onPress }) {
           marginBottom: 10,
         }}
       >
-        <BlockImage />
+        <BlockImage random={false} uri={imagem} />
         <View style={{ padding: 5, flex: 1 }}>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 20 }}>Titulo do post</Text>
+            <Text style={{ fontSize: 20 }}>
+              {nomeLocal ?? 'Titulo do post'}
+            </Text>
           </View>
           <ScrollView horizontal>
-            <View
-              onStartShouldSetResponder={() => true}
-              style={{ flexDirection: 'row' }}
-            >
-              <Badge>Tag 1</Badge>
-              <Badge>Tag 2</Badge>
-              <Badge>Tag loooonga 3</Badge>
-              <Badge>Tag 4</Badge>
-              <Badge>Tag 5</Badge>
-            </View>
+            <Tags tags={tags} />
           </ScrollView>
           <View style={{ flex: 1 }}>
-            <TextResumo>
-              Resumo do post bla bla bla bla bla bla bla bla bla bla bla bla bla
-              bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla
-              bla bla
-            </TextResumo>
+            {descricao ? (
+              <TextResumo>{descricao}</TextResumo>
+            ) : (
+              <TextResumo>
+                Resumo do post bla bla bla bla bla bla bla bla bla bla bla bla
+                bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla
+                bla bla bla
+              </TextResumo>
+            )}
           </View>
         </View>
       </View>
     </TouchableNativeFeedback>
   );
-}
+};
 
 export default CardPost;
