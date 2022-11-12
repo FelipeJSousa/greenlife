@@ -32,7 +32,7 @@ const Post = ({ route }) => {
       ?.then((resp) => {
         setImagem(resp);
       })
-      ?.catch((e) => {});
+      ?.catch((e) => { });
   };
 
   const ObterPost = () => {
@@ -133,7 +133,7 @@ const Post = ({ route }) => {
                 Autor: {post?.usuario ?? '-'}
               </Text>
               <Text style={{ fontSize: 15 }}>
-                {moment(post?.dataInclusao).fromNow() ?? '20/09/01 às 19:50'}
+                {moment(post?.dataInclusao).fromNow()}
               </Text>
             </View>
             <Text style={{ fontSize: 20 }}>{post?.descricao}</Text>
@@ -165,7 +165,7 @@ const Post = ({ route }) => {
               flex: 1,
               paddingHorizontal: 20,
               flexDirection: 'row',
-              justifyContent: 'space-evenly',
+              justifyContent: 'space-between',
               alignItems: 'center',
             }}
           >
@@ -189,27 +189,32 @@ const Post = ({ route }) => {
               </View>
             </TouchableNativeFeedback>
           </View>
-          <View
-            style={{
-              flex: 1,
-              paddingHorizontal: 20,
-              flexDirection: 'row',
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-            }}
-          >
-            {post?.coments?.length > 0 && (
-              <FlatList
-                style={{ paddingHorizontal: 10 }}
-                data={post.coments}
-                renderItem={({ item, i }) => (
-                  <Text>
-                    {item.dataInclusao} - {item.userNome} - {item.comentario}
+          <View>
+            {post?.coments?.length > 0 &&
+              post.coments.map((item, i) => (
+                <View
+                  key={`comentario${i}`}
+                  style={{
+                    borderWidth: 1,
+                    borderRadius: 20,
+                    padding: 20,
+                    margin: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text style={{ fontWeight: 'bold' }}>{item.userNome}</Text>
+                    <Text>{moment(item.dataInclusao).fromNow()}</Text>
+                  </View>
+                  <Text style={{ fontSize: 20, padding: 5 }}>
+                    {item.comentario}
                   </Text>
-                )}
-                keyExtractor={(item, index) => String(index) + item.id}
-              />
-            )}
+                </View>
+              ))}
           </View>
         </View>
       </ScrollView>
@@ -219,12 +224,13 @@ const Post = ({ route }) => {
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
+          marginBottom: 10,
         }}
       >
         <TextInput
           style={{ width: '75%' }}
           mode="outlined"
-          label="Comentário"
+          label="Novo Comentário"
           placeholder="Digite seu comentário"
           onChangeText={setComent}
           value={coment}
