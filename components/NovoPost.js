@@ -10,12 +10,11 @@ import {
   Pressable,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { Button, Snackbar, TextInput, Title } from 'react-native-paper';
 import ImageModal from 'react-native-image-modal';
+import { Entypo } from '@expo/vector-icons';
 import Firebase from '../config/Firebase';
 import { NovoPostContext } from '../providers/NovoPostContextProvider';
-import Badge from './Badge';
 import { AuthContext } from '../providers/AuthContextProvider';
 import Tags from './Tags';
 
@@ -119,108 +118,135 @@ const NovoPost = () => {
     !['latitude', 'longitude', 'latitudeDelta', 'longitudeDelta'].includes(key);
 
   return (
-    <ScrollView style={{ paddingVertical: 30, paddingHorizontal: 10 }}>
-      <View>
-        <Title
+    <>
+      <ScrollView style={{ paddingVertical: 30, paddingHorizontal: 10 }}>
+        <View>
+          <Title
+            style={{
+              padding: 20,
+              fontSize: 25,
+              lineHeight: 25,
+              textAlign: 'center',
+            }}
+          >
+            Preencha as informações:
+          </Title>
+        </View>
+        <View
           style={{
-            padding: 20,
-            fontSize: 25,
-            lineHeight: 25,
-            textAlign: 'center',
+            flex: 2,
+            justifyContent: 'space-evenly',
+            flexDirection: 'column',
           }}
         >
-          Preencha as informações:
-        </Title>
-      </View>
-      <View
-        style={{
-          flex: 2,
-          justifyContent: 'space-evenly',
-          flexDirection: 'column',
+          <TextInput
+            mode="outlined"
+            label="Nome do local"
+            placeholder="Digite o nome do local"
+            onChangeText={setNomeLocal}
+          />
+          <TextInput
+            mode="outlined"
+            label="Descrição"
+            placeholder="Digite a descrição do local"
+            onChangeText={setDescricao}
+            keyboardType="email-address"
+          />
+          <Button
+            icon="map"
+            mode="outlined"
+            style={{ marginVertical: 10 }}
+            onPress={SelecionarEndereco}
+          >
+            Inserir Endereço
+          </Button>
+          {enderecoMap && (
+            <View>
+              {enderecoMap &&
+                Object.entries(enderecoMap).map(([key, value]) => {
+                  if (renderAddressProp(key))
+                    return (
+                      <Text>
+                        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+                          {key}:
+                        </Text>{' '}
+                        {value}
+                      </Text>
+                    );
+
+                  return <></>;
+                })}
+            </View>
+          )}
+          <Button
+            icon="image"
+            mode="outlined"
+            style={{ marginVertical: 10 }}
+            onPress={SelecionarNovaFoto}
+          >
+            Selecionar Foto do local
+          </Button>
+          {imagens ? (
+            <ScrollView horizontal>
+              {imagens?.length > 0 &&
+                imagens?.map((ele) => (
+                  <ImageModal
+                    resizeMode="contain"
+                    style={{
+                      width: Dimensions.get('window').height / 5,
+                      height: Dimensions.get('window').height / 5,
+                    }}
+                    source={{
+                      uri: ele,
+                    }}
+                  />
+                ))}
+            </ScrollView>
+          ) : (
+            ''
+          )}
+          <Button
+            icon="tag"
+            mode="outlined"
+            style={{ marginVertical: 10 }}
+            onPress={() => setShowModalTag(true)}
+          >
+            Adicionar Tags
+          </Button>
+
+          <ScrollView horizontal style={{ height: 50 }}>
+            {tags?.length > 0 ? (
+              <Tags tags={tags} />
+            ) : (
+              <Text>Não há tags.</Text>
+            )}
+          </ScrollView>
+          <Button
+            icon="check"
+            mode="contained"
+            onPress={Salvar}
+            style={{ marginVertical: 10 }}
+          >
+            Salvar Dados
+          </Button>
+        </View>
+        <Snackbar
+          visible={showSnackBar}
+          onDismiss={fecharSnack}
+          action={{ label: 'Fechar' }}
+        >
+          {snackBarMessage}
+        </Snackbar>
+      </ScrollView>
+      <Modal
+        visible={showModalTag}
+        animationType="fade"
+        transparent
+        onRequestClose={() => {
+          setShowModalTag(!showModalTag);
         }}
       >
-        <TextInput
-          mode="outlined"
-          label="Nome do local"
-          placeholder="Digite o nome do local"
-          onChangeText={setNomeLocal}
-        />
-        <TextInput
-          mode="outlined"
-          label="Descrição"
-          placeholder="Digite a descrição do local"
-          onChangeText={setDescricao}
-          keyboardType="email-address"
-        />
-        <Button
-          icon="map"
-          mode="outlined"
-          style={{ marginVertical: 10 }}
-          onPress={SelecionarEndereco}
-        >
-          Inserir Endereço
-        </Button>
-        {enderecoMap && (
-          <View>
-            {enderecoMap &&
-              Object.entries(enderecoMap).map(([key, value]) => {
-                if (renderAddressProp(key))
-                  return (
-                    <Text>
-                      <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-                        {key}:
-                      </Text>{' '}
-                      {value}
-                    </Text>
-                  );
-
-                return <></>;
-              })}
-          </View>
-        )}
-        <Button
-          icon="image"
-          mode="outlined"
-          style={{ marginVertical: 10 }}
-          onPress={SelecionarNovaFoto}
-        >
-          Selecionar Foto do local
-        </Button>
-        {imagens ? (
-          <ScrollView horizontal>
-            {imagens?.length > 0 &&
-              imagens?.map((ele) => (
-                <ImageModal
-                  resizeMode="contain"
-                  style={{
-                    width: Dimensions.get('window').height / 5,
-                    height: Dimensions.get('window').height / 5,
-                  }}
-                  source={{
-                    uri: ele,
-                  }}
-                />
-              ))}
-          </ScrollView>
-        ) : (
-          ''
-        )}
-        <Button
-          icon="tag"
-          mode="outlined"
-          style={{ marginVertical: 10 }}
-          onPress={() => setShowModalTag(true)}
-        >
-          Adicionar Tags
-        </Button>
-        <Modal
-          visible={showModalTag}
-          animationType="fade"
-          transparent
-          onRequestClose={() => {
-            setShowModalTag(!showModalTag);
-          }}
-        >
+        <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Pressable
               style={[styles.button, styles.buttonClose]}
@@ -238,10 +264,9 @@ const NovoPost = () => {
 
             <View
               style={{
-                display: 'flex',
                 flexDirection: 'row',
-                justifyContent: 'center',
                 alignItems: 'center',
+                height: '40%',
               }}
             >
               <TextInput
@@ -251,53 +276,35 @@ const NovoPost = () => {
                 onChangeText={setNovaTag}
                 value={novaTag}
                 onSubmitEditing={() => addNovaTag(novaTag)}
-                style={{ width: 250, height: 60 }}
+                style={{
+                  width: 250,
+                  height: '100%',
+                  position: 'relative',
+                }}
               />
               <Pressable
                 onPress={() =>
                   novaTag.length > 0 ? addNovaTag(novaTag) : console.log()
                 }
+                style={{
+                  marginTop: '2.3%',
+                  marginLeft: -10,
+                  width: '20%',
+                  height: '94.5%',
+                  borderTopRightRadius: 30,
+                  borderBottomRightRadius: 30,
+                  backgroundColor: '#2196F3',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
               >
-                <Text
-                  style={{
-                    color: '#FFF',
-                    fontSize: 40,
-                    paddingHorizontal: 20,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: 60,
-                    marginTop: 8,
-                    borderTopRightRadius: 30,
-                    borderBottomRightRadius: 30,
-                    backgroundColor: '#2196F3',
-                  }}
-                >
-                  +
-                </Text>
+                <Entypo name="plus" color="white" size={40} />
               </Pressable>
             </View>
           </View>
-        </Modal>
-        <ScrollView horizontal style={{ height: 50 }}>
-          {tags?.length > 0 ? <Tags tags={tags} /> : <Text>Não há tags.</Text>}
-        </ScrollView>
-        <Button
-          icon="check"
-          mode="contained"
-          onPress={Salvar}
-          style={{ marginVertical: 10 }}
-        >
-          Salvar Dados
-        </Button>
-      </View>
-      <Snackbar
-        visible={showSnackBar}
-        onDismiss={fecharSnack}
-        action={{ label: 'Fechar' }}
-      >
-        {snackBarMessage}
-      </Snackbar>
-    </ScrollView>
+        </View>
+      </Modal>
+    </>
   );
 };
 
@@ -307,22 +314,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
-  },
-  modalView: {
-    display: 'flex',
-    height: 'auto',
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 25,
-    padding: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 100,
   },
   button: {
     borderRadius: 20,
@@ -341,6 +332,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     paddingHorizontal: 5,
+  },
+  modalView: {
+    minHeight: 200,
+    height: '20%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 100,
   },
   modalText: {
     marginBottom: 15,
