@@ -1,8 +1,7 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Dimensions,
-  FlatList,
   ScrollView,
   Text,
   View,
@@ -17,6 +16,8 @@ import ImageModal from 'react-native-image-modal';
 import Firebase from '../config/Firebase';
 import { NovoPostContext } from '../providers/NovoPostContextProvider';
 import Badge from './Badge';
+import { AuthContext } from '../providers/AuthContextProvider';
+import Tags from './Tags';
 
 const NovoPost = () => {
   const navigation = useNavigation();
@@ -26,6 +27,7 @@ const NovoPost = () => {
   const [showSnackBar, setShowSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const { enderecoMap, setEnderecoMap } = useContext(NovoPostContext);
+  const { user } = useContext(AuthContext);
   const [showModalTag, setShowModalTag] = useState(false);
   const [tags, setTags] = useState([]);
   const [novaTag, setNovaTag] = useState([]);
@@ -61,7 +63,10 @@ const NovoPost = () => {
 
   const DadosEhValido = () => {
     const result =
-      nomeLocal !== '' && descricao !== '' && imagens !== '' && !!enderecoMap;
+      nomeLocal !== '' &&
+      descricao !== '' &&
+      imagens?.length > 0 &&
+      !!enderecoMap;
 
     if (result === false) mostrarSnack('Preencha todos os dados!');
     return result;
@@ -75,6 +80,8 @@ const NovoPost = () => {
       endereco: enderecoMap,
       dataInclusao: Date(),
       tags,
+      usuario: user.nomeCompleto,
+      likes: [],
     };
 
     const db = Firebase.database().ref('posts');
@@ -107,20 +114,16 @@ const NovoPost = () => {
     setTags((e) => [...e, tag]);
     setNovaTag('');
   };
+
+  const renderAddressProp = (key) =>
+    !['latitude', 'longitude', 'latitudeDelta', 'longitudeDelta'].includes(key);
+
   return (
-    <ScrollView
-      nestedScrollEnabled
-      style={{ paddingTop: getStatusBarHeight(), paddingHorizontal: 10 }}
-    >
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          paddingVertical: 50,
-        }}
-      >
+    <ScrollView style={{ paddingVertical: 30, paddingHorizontal: 10 }}>
+      <View>
         <Title
           style={{
+            padding: 20,
             fontSize: 25,
             lineHeight: 25,
             textAlign: 'center',
@@ -160,14 +163,19 @@ const NovoPost = () => {
         {enderecoMap && (
           <View>
             {enderecoMap &&
-              Object.entries(enderecoMap).map(([key, value]) => (
-                <Text>
-                  <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-                    {key}:
-                  </Text>{' '}
-                  {value}
-                </Text>
-              ))}
+              Object.entries(enderecoMap).map(([key, value]) => {
+                if (renderAddressProp(key))
+                  return (
+                    <Text>
+                      <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+                        {key}:
+                      </Text>{' '}
+                      {value}
+                    </Text>
+                  );
+
+                return <></>;
+              })}
           </View>
         )}
         <Button
@@ -222,11 +230,7 @@ const NovoPost = () => {
             </Pressable>
             <ScrollView horizontal style={{ height: 50, marginHorizontal: 20 }}>
               {tags?.length > 0 ? (
-                tags.map((tag, i) => (
-                  <Badge key={`novatag${i}`} size={13}>
-                    {tag}
-                  </Badge>
-                ))
+                <Tags tags={tags} />
               ) : (
                 <Text>Não há tags.</Text>
               )}
@@ -275,15 +279,7 @@ const NovoPost = () => {
           </View>
         </Modal>
         <ScrollView horizontal style={{ height: 50 }}>
-          {tags?.length > 0 ? (
-            tags.map((tag, i) => (
-              <Badge key={`tag${i}`} size={15}>
-                {tag}
-              </Badge>
-            ))
-          ) : (
-            <Text>Não há tags.</Text>
-          )}
+          {tags?.length > 0 ? <Tags tags={tags} /> : <Text>Não há tags.</Text>}
         </ScrollView>
         <Button
           icon="check"

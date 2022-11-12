@@ -1,8 +1,8 @@
 import { Text, ScrollView, View, TouchableNativeFeedback } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import Badge from './Badge';
 import BlockImage from './BlockImage';
 import Firebase from '../config/Firebase';
+import Tags from './Tags';
 
 const TextResumo = ({ children }) => {
   const text = `${children.substring(0, 65)}...`;
@@ -14,9 +14,12 @@ const CardPost = ({ onPress, post }) => {
   const { id, nomeLocal, tags, descricao } = post;
   const obterImagem = () => {
     const storage = Firebase.storage().ref(`posts/${id}`);
-    storage.getDownloadURL().then((resp) => {
-      setImagem(resp);
-    });
+    storage
+      ?.getDownloadURL()
+      ?.then((resp) => {
+        if (resp) setImagem(resp);
+      })
+      ?.catch((e) => {});
   };
   useEffect(() => {
     obterImagem();
@@ -34,7 +37,7 @@ const CardPost = ({ onPress, post }) => {
           marginBottom: 10,
         }}
       >
-        <BlockImage random={!!imagem} uri={imagem} />
+        <BlockImage random={false} uri={imagem} />
         <View style={{ padding: 5, flex: 1 }}>
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20 }}>
@@ -42,13 +45,7 @@ const CardPost = ({ onPress, post }) => {
             </Text>
           </View>
           <ScrollView horizontal>
-            <View
-              onStartShouldSetResponder={() => true}
-              style={{ flexDirection: 'row' }}
-            >
-              {tags?.length > 0 &&
-                tags.map((tag, i) => <Badge key={`tag${i}`}>{tag}</Badge>)}
-            </View>
+            <Tags tags={tags} />
           </ScrollView>
           <View style={{ flex: 1 }}>
             {descricao ? (

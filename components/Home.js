@@ -1,7 +1,8 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, Alert, ScrollView, StyleSheet, Text } from 'react-native';
-import { Button } from 'react-native-paper';
+import { FlatList } from 'react-native-gesture-handler';
+import { Button, ActivityIndicator } from 'react-native-paper';
 import Firebase from '../config/Firebase';
 import { AuthContext } from '../providers/AuthContextProvider';
 import CardPost from './CardPost';
@@ -11,19 +12,25 @@ const styles = StyleSheet.create({
   feedList: { flex: 5, padding: 10 },
 });
 
+const Loading = ({ animate }) => {
+  if (animate === true)
+    return <ActivityIndicator animating={animate} color="#008C8C" />;
+  return <Text>Não há nenhum Post.</Text>;
+};
+
 const Home = () => {
   const navigation = useNavigation();
   const { Logout } = useContext(AuthContext);
-  const [posts, setPosts] = useState([]);
-  const CardPressHandle = () => {
-    navigation?.navigate('Post');
+  const [posts, setPosts] = useState(null);
+  const CardPressHandle = (PostId) => {
+    navigation?.navigate('Post', { id: PostId });
   };
 
   const CriarPostagem = () => {
     navigation.navigate('NovoPost');
   };
 
-  const ObterUltimosPosts = () => {
+  const ObterUltimosPosts = async () => {
     const db = Firebase.database().ref('posts');
     const postsCarregados = [];
     db.on('value', (snapshot) => {
@@ -36,8 +43,8 @@ const Home = () => {
           dataInclusao: value.val().dataInclusao,
         });
       });
+      setPosts(postsCarregados);
     });
-    setPosts(postsCarregados);
   };
 
   const DisposeEvent = () => {
@@ -65,7 +72,6 @@ const Home = () => {
   useFocusEffect(
     useCallback(() => {
       ObterUltimosPosts();
-      console.log(posts);
     }, [])
   );
 
@@ -104,15 +110,22 @@ const Home = () => {
       >
         Ultimas postagens
       </Text>
-      <ScrollView style={styles.feedList}>
-        {posts?.length > 0 ? (
-          posts.map((post, i) => (
-            <CardPost key={i} onPress={CardPressHandle} post={post} />
-          ))
-        ) : (
-          <Text>Não há nenhum Post.</Text>
-        )}
-      </ScrollView>
+      {posts?.length > 0 ? (
+        <FlatList
+          style={{ paddingHorizontal: 10 }}
+          data={posts}
+          renderItem={({ item, i }) => (
+            <CardPost
+              key={`cardpost${i}`}
+              onPress={() => CardPressHandle(item.id)}
+              post={item}
+            />
+          )}
+          keyExtractor={(item, index) => String(index) + item.id}
+        />
+      ) : (
+        <Loading animate={posts == null} />
+      )}
     </>
   );
 };
